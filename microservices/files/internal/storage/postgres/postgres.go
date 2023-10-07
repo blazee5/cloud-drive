@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/blazee5/cloud-drive/internal/config"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/config"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/blazee5/cloud-drive/internal/models"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"os"

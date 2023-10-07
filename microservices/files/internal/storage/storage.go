@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	"github.com/blazee5/cloud-drive/internal/models"
-	"github.com/blazee5/cloud-drive/internal/storage/postgres"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/models"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/storage/postgres"
 	"github.com/jmoiron/sqlx"
 )
 

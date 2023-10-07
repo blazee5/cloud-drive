@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package files;
+
+message File {
+  int64 id = 1;
+  string name = 2;
+  string user_id = 3;
+}
+
+message FileRequest {
+  string name = 1;
+  string user_id = 2;
+}
+
+message FileResponse {
+  string id = 1;
+}
+
+service FileService {
+  rpc UploadFile(FileRequest) returns (FileResponse);
+}

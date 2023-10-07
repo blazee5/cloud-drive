@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/blazee5/cloud-drive/internal/service"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/service"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )

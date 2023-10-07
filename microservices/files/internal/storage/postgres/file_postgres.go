@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	"github.com/blazee5/cloud-drive/internal/models"
+	"github.com/blazee5/cloud-drive/microservices/files/internal/models"
 	"github.com/jmoiron/sqlx"
 	"time"
 )
