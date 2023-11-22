@@ -7,17 +7,46 @@ import (
 	"go.uber.org/zap"
 )
 
-type File interface {
-	Upload(ctx context.Context, file models.File) (int, error)
-	AddCount(ctx context.Context, fileName string) error
+type Service interface {
+	Upload(ctx context.Context, fileName string, userId string, chunk []byte, contentType string) (int, error)
+	Download(ctx context.Context, userId, fileName string) (*models.File, error)
 }
 
-type Service struct {
-	File
+type FileService struct {
+	log  *zap.SugaredLogger
+	repo *storage.Storage
 }
 
-func NewService(log *zap.SugaredLogger, db *storage.Storage) *Service {
-	return &Service{
-		File: NewFileService(log, db),
+func NewFileService(log *zap.SugaredLogger, repo *storage.Storage) *FileService {
+	return &FileService{log: log, repo: repo}
+}
+
+func (s *FileService) Upload(ctx context.Context, fileName string, userId string, chunk []byte, contentType string) (int, error) {
+	err := s.repo.AwsStorage.SaveFile(ctx, userId, fileName, contentType, chunk)
+
+	if err != nil {
+		return 0, err
 	}
+
+	return s.repo.PostgresStorage.Create(ctx, fileName, userId)
+}
+
+func (s *FileService) Download(ctx context.Context, userId, fileName string) (*models.File, error) {
+	object, err := s.repo.DownloadFile(ctx, userId, fileName)
+
+	if err != nil {
+		return nil, err
+	}
+
+	file := models.File{}
+
+	file.Chunk = object
+
+	err = s.repo.AddCount(ctx, fileName)
+
+	if err != nil {
+		s.log.Infof("error while add download count: %v", err)
+	}
+
+	return &file, nil
 }

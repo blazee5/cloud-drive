@@ -2,13 +2,14 @@ package app
 
 import (
 	"fmt"
+	pb "github.com/blazee5/cloud-drive/microservices/files/api/v1"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/config"
-	"github.com/blazee5/cloud-drive/microservices/files/internal/handler"
+	grpcServer "github.com/blazee5/cloud-drive/microservices/files/internal/grpc"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/service"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/storage"
-	"github.com/blazee5/cloud-drive/microservices/files/internal/storage/postgres"
+	"github.com/blazee5/cloud-drive/microservices/files/lib/db/aws"
+	"github.com/blazee5/cloud-drive/microservices/files/lib/db/postgres"
 	"github.com/blazee5/cloud-drive/microservices/files/lib/logger"
-	"github.com/gofiber/fiber/v2"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -19,25 +20,24 @@ import (
 func Run(cfg *config.Config) {
 	log := logger.NewLogger()
 
-	app := fiber.New()
+	awsClient := aws.NewAWSClient(cfg)
 
-	db := postgres.NewPostgres(cfg)
-	storages := storage.NewStorage(db)
-	services := service.NewService(log, storages)
-	handlers := handler.NewHandler(log, services)
+	db := postgres.New(cfg)
 
-	handlers.InitRoutes(app)
+	storages := storage.NewStorage(db, awsClient)
+	services := service.NewFileService(log, storages)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.HTTPServer.Port))
 	if err != nil {
 		log.Info("failed to listen: %v", err)
 	}
-	server := grpc.NewServer()
+	s := grpc.NewServer()
+	pb.RegisterFileServiceServer(s, grpcServer.NewServer(log, services))
 
 	log.Info(fmt.Sprintf("server listening at %s", lis.Addr().String()))
 
 	go func() {
-		if err := server.Serve(lis); err != nil {
+		if err := s.Serve(lis); err != nil {
 			log.Infof("error while listen server: %s", err)
 		}
 	}()
@@ -48,8 +48,8 @@ func Run(cfg *config.Config) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	server.GracefulStop()
-	if err := db.Close(); err != nil {
-		log.Infof("error while close db: %s", err)
+	s.GracefulStop()
+	if err = db.Close(); err != nil {
+		log.Infof("error while close db conn: %v", err)
 	}
 }
