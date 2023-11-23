@@ -15,6 +15,7 @@ type Storage struct {
 
 type PostgresStorage interface {
 	Create(ctx context.Context, fileName, userId string) (int, error)
+	GetById(ctx context.Context, fileName string) (*ent.File, error)
 	AddCount(ctx context.Context, fileName string) error
 }
 

@@ -38,9 +38,11 @@ func (s *FileService) Download(ctx context.Context, userId, fileName string) (*m
 		return nil, err
 	}
 
-	file := models.File{}
+	file, err := s.repo.GetById(ctx, fileName)
 
-	file.Chunk = object
+	if err != nil {
+		return nil, err
+	}
 
 	err = s.repo.AddCount(ctx, fileName)
 
@@ -48,5 +50,10 @@ func (s *FileService) Download(ctx context.Context, userId, fileName string) (*m
 		s.log.Infof("error while add download count: %v", err)
 	}
 
-	return &file, nil
+	return &models.File{
+		Id:     file.ID,
+		Name:   file.Name,
+		UserId: file.UserID,
+		Chunk:  object,
+	}, nil
 }

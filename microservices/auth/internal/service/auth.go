@@ -27,7 +27,7 @@ func (s *AuthService) GenerateToken(ctx context.Context, input *pb.SignInRequest
 	user, err := s.storage.Auth.VerifyUser(ctx, input)
 
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	token, err := auth.GenerateToken(user.Id)

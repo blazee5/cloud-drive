@@ -3,9 +3,8 @@ package aws
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/minio/minio-go/v7"
-	"os"
+	"io"
 )
 
 type Storage struct {
@@ -24,8 +23,7 @@ func (s *Storage) SaveFile(ctx context.Context, bucket, fileName, contentType st
 
 	file := bytes.NewReader(chunk)
 
-	info, err := s.client.PutObject(ctx, bucket, fileName, file, file.Size(), options)
-	fmt.Println(info)
+	_, err := s.client.PutObject(ctx, bucket, fileName, file, file.Size(), options)
 
 	if err != nil {
 		return err
@@ -37,27 +35,19 @@ func (s *Storage) SaveFile(ctx context.Context, bucket, fileName, contentType st
 func (s *Storage) DownloadFile(ctx context.Context, bucket string, fileName string) ([]byte, error) {
 	options := minio.GetObjectOptions{}
 
-	err := s.client.FGetObject(ctx, bucket, fileName, "./temp/"+fileName, options)
+	file, err := s.client.GetObject(ctx, bucket, fileName, options)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var file []byte
-
-	fileReader, err := os.Open("./temp/" + fileName)
+	chunk, err := io.ReadAll(file)
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = fileReader.Read(file)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
+	return chunk, nil
 }
 
 func (s *Storage) RemoveObject(ctx context.Context, bucket string, fileName string) error {

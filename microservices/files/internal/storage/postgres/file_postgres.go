@@ -24,6 +24,16 @@ func (s *FileStorage) Create(ctx context.Context, fileName string, userId string
 	return res.ID, nil
 }
 
+func (s *FileStorage) GetById(ctx context.Context, fileName string) (*ent.File, error) {
+	file, err := s.db.File.Query().Where(file.Name(fileName)).Only(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+
 func (s *FileStorage) AddCount(ctx context.Context, fileName string) error {
 	_, err := s.db.File.Update().Where(file.Name(fileName)).AddDownloadCount(1).Save(ctx)
 
