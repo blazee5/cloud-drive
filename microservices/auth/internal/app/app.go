@@ -9,7 +9,7 @@ import (
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/service"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage/mongodb"
-	"github.com/blazee5/cloud-drive/microservices/files/lib/logger"
+	"github.com/blazee5/cloud-drive/microservices/auth/lib/logger"
 	"google.golang.org/grpc"
 	"net"
 	"os"
