@@ -30,23 +30,6 @@ func GenerateToken(userID string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-func ParseToken(token string) (string, error) {
-	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(signingKey), nil
-	})
-
-	if err != nil {
-		return "", err
-	}
-
-	claims, ok := parsedToken.Claims.(*tokenClaims)
-	if !ok {
-		return "", err
-	}
-
-	return claims.UserID, nil
-}
-
 func GenerateHashPassword(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))
