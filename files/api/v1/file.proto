@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package file;
+
+option go_package = "github.com/blazee/cloud-drive/microservices/files";
+
+service FileService {
+  rpc GetFiles(UserRequest) returns (FileResponse);
+  rpc UploadFile(UploadRequest) returns (UploadResponse);
+  rpc DownloadFile(FileRequest) returns (File);
+  rpc UpdateFile (UpdateFileRequest) returns (SuccessResponse);
+  rpc DeleteFile (FileRequest) returns (SuccessResponse);
+}
+
+message UserRequest {
+  string user_id = 1;
+}
+
+message FileRequest {
+  int64 id = 1;
+  string user_id = 2;
+}
+
+message File {
+  int64 id = 1;
+  string name = 2;
+  string user_id = 3;
+  string content_type = 4;
+  bytes chunk = 5;
+}
+
+message FileInfo {
+  int64 id = 1;
+  string name = 2;
+  string user_id = 3;
+  int64 download_count = 4;
+}
+
+message UpdateFileRequest {
+  int64 id = 1;
+  string name = 2;
+  string user_id = 3;
+}
+
+message FileResponse {
+  repeated FileInfo files = 1;
+}
+
+message UploadRequest {
+  string file_name = 1;
+  string file_type = 2;
+  string user_id = 3;
+  bytes chunk = 4;
+}
+
+message UploadResponse {
+  int64 id = 1;
+}
+
+message SuccessResponse {
+  string success = 1;
+}

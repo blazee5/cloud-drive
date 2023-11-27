@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/cloud-drive/auth";
+
+service AuthService {
+  rpc SignUp(SignUpRequest) returns (UserResponse);
+  rpc SignIn(SignInRequest) returns (Token);
+  rpc ValidateUser(TokenRequest) returns (UserResponse);
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message SignUpRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message SignInRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message UserRequest {
+  string id = 1;
+}
+
+message UserResponse {
+  string id = 1;
+}
+
+message Token {
+  string token = 1;
+}
+
+message TokenRequest {
+  string token = 1;
+}
