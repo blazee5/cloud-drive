@@ -25,7 +25,7 @@ func Run(cfg *config.Config) {
 	client := mongodb.NewMongoDB(ctx, cfg)
 	db := client.Database("cloud-drive")
 	storages := storage.NewStorage(db)
-	services := service.NewService(log, storages)
+	services := service.NewAuthService(log, storages)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))
 	if err != nil {
@@ -35,7 +35,7 @@ func Run(cfg *config.Config) {
 	log.Info(fmt.Sprintf("server listening at %s", lis.Addr().String()))
 	s := grpc.NewServer()
 
-	pb.RegisterAuthServiceServer(s, handler.NewServer(services))
+	pb.RegisterAuthServiceServer(s, handler.NewServer(log, services))
 
 	go func() {
 		if err := s.Serve(lis); err != nil {

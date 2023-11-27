@@ -1,8 +1,14 @@
 package models
 
 type File struct {
-	Id     int    `json:"id" db:"id"`
+	ID     int    `json:"id" db:"id"`
 	Name   string `json:"name" db:"name"`
-	UserId string `json:"user_id" db:"user_id"`
+	UserID string `json:"user_id" db:"user_id"`
 	Chunk  []byte `json:"chunk" db:"chunk"`
+}
+
+type FileInfo struct {
+	ID     int    `json:"id" db:"id"`
+	Name   string `json:"name" db:"name"`
+	UserID string `json:"user_id" db:"user_id"`
 }
