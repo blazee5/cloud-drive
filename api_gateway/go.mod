@@ -3,13 +3,13 @@ module github.com/blazee5/cloud-drive/microservices/api_gateway
 go 1.21.4
 
 require (
+	github.com/blazee5/cloud-drive-protos v0.0.2
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.59.0
-	google.golang.org/protobuf v1.31.0
 )
 
 require (
@@ -39,5 +39,6 @@ require (
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

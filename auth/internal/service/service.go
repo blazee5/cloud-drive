@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	pb "github.com/blazee5/cloud-drive/microservices/auth/api/v1"
+	pb "github.com/blazee5/cloud-drive-protos/auth"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage"
 	"github.com/blazee5/cloud-drive/microservices/auth/lib/auth"
 	"go.uber.org/zap"

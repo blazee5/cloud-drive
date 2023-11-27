@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
-	pb "github.com/blazee5/cloud-drive/microservices/auth/api/v1"
+	pb "github.com/blazee5/cloud-drive-protos/auth"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/config"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/handler"
 	"github.com/blazee5/cloud-drive/microservices/auth/internal/service"

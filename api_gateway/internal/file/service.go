@@ -2,8 +2,8 @@ package file
 
 import (
 	"context"
+	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/domain"
-	pb "github.com/blazee5/cloud-drive/microservices/api_gateway/proto/files"
 	"mime/multipart"
 )
 

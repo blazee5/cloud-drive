@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	pb "github.com/blazee5/cloud-drive/microservices/files/api/v1"
+	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/models"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/storage"
 	"github.com/blazee5/cloud-drive/microservices/files/lib/http_errors"

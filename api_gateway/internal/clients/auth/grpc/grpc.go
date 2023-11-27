@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/proto/auth"
+	pb "github.com/blazee5/cloud-drive-protos/auth"
 	grpclog "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func NewAuthServiceClient(log *zap.SugaredLogger) auth.AuthServiceClient {
+func NewAuthServiceClient(log *zap.SugaredLogger) pb.AuthServiceClient {
 	timeout, err := time.ParseDuration(os.Getenv("CLIENT_TIMEOUT"))
 
 	if err != nil {
@@ -50,7 +50,7 @@ func NewAuthServiceClient(log *zap.SugaredLogger) auth.AuthServiceClient {
 		log.Fatalf("error while connect to auth client: %s", err)
 	}
 
-	return auth.NewAuthServiceClient(cc)
+	return pb.NewAuthServiceClient(cc)
 }
 
 func InterceptorLogger() grpclog.Logger {

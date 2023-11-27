@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/proto/files"
+	pb "github.com/blazee5/cloud-drive-protos/files"
 	grpclog "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"go.uber.org/zap"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-func NewFileServiceClient(log *zap.SugaredLogger) files.FileServiceClient {
+func NewFileServiceClient(log *zap.SugaredLogger) pb.FileServiceClient {
 	timeout, err := time.ParseDuration(os.Getenv("CLIENT_TIMEOUT"))
 
 	if err != nil {
@@ -50,7 +50,7 @@ func NewFileServiceClient(log *zap.SugaredLogger) files.FileServiceClient {
 		log.Fatalf("error while connect to files client: %s", err)
 	}
 
-	return files.NewFileServiceClient(cc)
+	return pb.NewFileServiceClient(cc)
 }
 
 func InterceptorLogger() grpclog.Logger {
