@@ -4,11 +4,6 @@ package auth;
 
 option go_package = "github.com/cloud-drive/microservices/auth";
 
-service AuthService {
-  rpc SignUp(SignUpRequest) returns (UserResponse);
-  rpc SignIn(SignInRequest) returns (Token);
-}
-
 message User {
   string id = 1;
   string name = 2;
@@ -37,4 +32,9 @@ message UserResponse {
 
 message Token {
   string token = 1;
+}
+
+service AuthService {
+  rpc SignUp(SignUpRequest) returns (UserResponse);
+  rpc SignIn(SignInRequest) returns (Token);
 }

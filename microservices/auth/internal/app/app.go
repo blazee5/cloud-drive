@@ -35,7 +35,7 @@ func Run(cfg *config.Config) {
 	log.Info(fmt.Sprintf("server listening at %s", lis.Addr().String()))
 	s := grpc.NewServer()
 
-	pb.RegisterAuthServiceServer(s, handler.NewServer(services))
+	pb.RegisterAuthServiceServer(s, handler.NewServer(log, services))
 
 	go func() {
 		if err := s.Serve(lis); err != nil {
