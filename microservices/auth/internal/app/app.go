@@ -25,7 +25,7 @@ func Run(cfg *config.Config) {
 	client := mongodb.NewMongoDB(ctx, cfg)
 	db := client.Database("cloud-drive")
 	storages := storage.NewStorage(db)
-	services := service.NewService(log, storages)
+	services := service.NewAuthService(log, storages)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))
 	if err != nil {
