@@ -31,7 +31,7 @@ func (s *Service) SignUp(ctx context.Context, input domain.SignUpRequest) (strin
 		return "", err
 	}
 
-	return res.GetID(), nil
+	return res.GetId(), nil
 }
 
 func (s *Service) SignIn(ctx context.Context, input domain.SignInRequest) (string, error) {
@@ -45,4 +45,16 @@ func (s *Service) SignIn(ctx context.Context, input domain.SignInRequest) (strin
 	}
 
 	return res.GetToken(), nil
+}
+
+func (s *Service) ValidateUser(ctx context.Context, token string) (string, error) {
+	res, err := s.api.ValidateUser(ctx, &pb.TokenRequest{
+		Token: token,
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return res.GetId(), nil
 }
