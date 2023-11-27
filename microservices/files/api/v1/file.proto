@@ -5,7 +5,7 @@ package file;
 option go_package = "github.com/blazee/cloud-drive/microservices/files";
 
 service FileService {
-  rpc GetFiles(UserRequest) returns (FilesResponse);
+  rpc GetFiles(UserRequest) returns (FileResponse);
   rpc UploadFile(UploadRequest) returns (UploadResponse);
   rpc DownloadFile(FileRequest) returns (File);
   rpc UpdateFile (UpdateFileRequest) returns (SuccessResponse);
@@ -13,12 +13,12 @@ service FileService {
 }
 
 message UserRequest {
-  int64 user_id = 1;
+  string user_id = 1;
 }
 
 message FileRequest {
-  string user_id = 1;
-  string file_name = 2;
+  int64 id = 1;
+  string user_id = 2;
 }
 
 message File {
@@ -32,14 +32,16 @@ message FileInfo {
   int64 id = 1;
   string name = 2;
   string user_id = 3;
+  int64 download_count = 4;
 }
 
 message UpdateFileRequest {
   int64 id = 1;
   string name = 2;
+  string user_id = 3;
 }
 
-message FilesResponse {
+message FileResponse {
   repeated FileInfo files = 1;
 }
 

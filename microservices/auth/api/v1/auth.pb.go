@@ -25,7 +25,7 @@ type User struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Email    string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	Password string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
@@ -63,9 +63,9 @@ func (*User) Descriptor() ([]byte, []int) {
 	return file_api_v1_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *User) GetId() string {
+func (x *User) GetID() string {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return ""
 }
@@ -214,7 +214,7 @@ type UserRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (x *UserRequest) Reset() {
@@ -249,9 +249,9 @@ func (*UserRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_auth_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *UserRequest) GetId() string {
+func (x *UserRequest) GetID() string {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return ""
 }
@@ -261,7 +261,7 @@ type UserResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (x *UserResponse) Reset() {
@@ -296,9 +296,9 @@ func (*UserResponse) Descriptor() ([]byte, []int) {
 	return file_api_v1_auth_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *UserResponse) GetId() string {
+func (x *UserResponse) GetID() string {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return ""
 }
@@ -410,7 +410,7 @@ var file_api_v1_auth_proto_goTypes = []interface{}{
 	(*UserResponse)(nil),  // 4: auth.UserResponse
 	(*Token)(nil),         // 5: auth.Token
 }
-var file_api_v1_auth_proto_depIdxs = []int32{
+var file_api_v1_auth_proto_depIDxs = []int32{
 	1, // 0: auth.AuthService.SignUp:input_type -> auth.SignUpRequest
 	2, // 1: auth.AuthService.SignIn:input_type -> auth.SignInRequest
 	4, // 2: auth.AuthService.SignUp:output_type -> auth.UserResponse
@@ -512,11 +512,11 @@ func file_api_v1_auth_proto_init() {
 			NumServices:   1,
 		},
 		GoTypes:           file_api_v1_auth_proto_goTypes,
-		DependencyIndexes: file_api_v1_auth_proto_depIdxs,
+		DependencyIndexes: file_api_v1_auth_proto_depIDxs,
 		MessageInfos:      file_api_v1_auth_proto_msgTypes,
 	}.Build()
 	File_api_v1_auth_proto = out.File
 	file_api_v1_auth_proto_rawDesc = nil
 	file_api_v1_auth_proto_goTypes = nil
-	file_api_v1_auth_proto_depIdxs = nil
+	file_api_v1_auth_proto_depIDxs = nil
 }

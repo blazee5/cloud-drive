@@ -15,16 +15,16 @@ const (
 
 type tokenClaims struct {
 	jwt.RegisteredClaims
-	UserId string `json:"user_id"`
+	UserID string `json:"user_id"`
 }
 
-func GenerateToken(userId string) (string, error) {
+func GenerateToken(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-		userId,
+		userID,
 	})
 
 	return token.SignedString([]byte(signingKey))
@@ -44,7 +44,7 @@ func ParseToken(token string) (string, error) {
 		return "", err
 	}
 
-	return claims.UserId, nil
+	return claims.UserID, nil
 }
 
 func GenerateHashPassword(password string) string {

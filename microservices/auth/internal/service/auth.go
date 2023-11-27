@@ -30,7 +30,7 @@ func (s *AuthService) GenerateToken(ctx context.Context, input *pb.SignInRequest
 		return "", err
 	}
 
-	token, err := auth.GenerateToken(user.Id)
+	token, err := auth.GenerateToken(user.ID)
 
 	if err != nil {
 		return "", err

@@ -25,7 +25,7 @@ type FileRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId   string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserID   string `protobuf:"bytes,1,opt,name=user_id,json=userID,proto3" json:"user_id,omitempty"`
 	FileName string `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
 }
 
@@ -61,9 +61,9 @@ func (*FileRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_file_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *FileRequest) GetUserId() string {
+func (x *FileRequest) GetUserID() string {
 	if x != nil {
-		return x.UserId
+		return x.UserID
 	}
 	return ""
 }
@@ -80,9 +80,9 @@ type File struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id     int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID     int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name   string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	UserId string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserID string `protobuf:"bytes,3,opt,name=user_id,json=userID,proto3" json:"user_id,omitempty"`
 	Chunk  []byte `protobuf:"bytes,4,opt,name=chunk,proto3" json:"chunk,omitempty"`
 }
 
@@ -118,9 +118,9 @@ func (*File) Descriptor() ([]byte, []int) {
 	return file_api_v1_file_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *File) GetId() int64 {
+func (x *File) GetID() int64 {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return 0
 }
@@ -132,9 +132,9 @@ func (x *File) GetName() string {
 	return ""
 }
 
-func (x *File) GetUserId() string {
+func (x *File) GetUserID() string {
 	if x != nil {
-		return x.UserId
+		return x.UserID
 	}
 	return ""
 }
@@ -153,7 +153,7 @@ type UploadRequest struct {
 
 	FileName string `protobuf:"bytes,1,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
 	FileType string `protobuf:"bytes,2,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
-	UserId   string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserID   string `protobuf:"bytes,3,opt,name=user_id,json=userID,proto3" json:"user_id,omitempty"`
 	Chunk    []byte `protobuf:"bytes,4,opt,name=chunk,proto3" json:"chunk,omitempty"`
 }
 
@@ -203,9 +203,9 @@ func (x *UploadRequest) GetFileType() string {
 	return ""
 }
 
-func (x *UploadRequest) GetUserId() string {
+func (x *UploadRequest) GetUserID() string {
 	if x != nil {
-		return x.UserId
+		return x.UserID
 	}
 	return ""
 }
@@ -222,7 +222,7 @@ type UploadResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
 func (x *UploadResponse) Reset() {
@@ -257,9 +257,9 @@ func (*UploadResponse) Descriptor() ([]byte, []int) {
 	return file_api_v1_file_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *UploadResponse) GetId() int64 {
+func (x *UploadResponse) GetID() int64 {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return 0
 }
@@ -321,7 +321,7 @@ var file_api_v1_file_proto_goTypes = []interface{}{
 	(*UploadRequest)(nil),  // 2: file.UploadRequest
 	(*UploadResponse)(nil), // 3: file.UploadResponse
 }
-var file_api_v1_file_proto_depIdxs = []int32{
+var file_api_v1_file_proto_depIDxs = []int32{
 	2, // 0: file.FileService.UploadFile:input_type -> file.UploadRequest
 	0, // 1: file.FileService.DownloadFile:input_type -> file.FileRequest
 	3, // 2: file.FileService.UploadFile:output_type -> file.UploadResponse
@@ -399,11 +399,11 @@ func file_api_v1_file_proto_init() {
 			NumServices:   1,
 		},
 		GoTypes:           file_api_v1_file_proto_goTypes,
-		DependencyIndexes: file_api_v1_file_proto_depIdxs,
+		DependencyIndexes: file_api_v1_file_proto_depIDxs,
 		MessageInfos:      file_api_v1_file_proto_msgTypes,
 	}.Build()
 	File_api_v1_file_proto = out.File
 	file_api_v1_file_proto_rawDesc = nil
 	file_api_v1_file_proto_goTypes = nil
-	file_api_v1_file_proto_depIdxs = nil
+	file_api_v1_file_proto_depIDxs = nil
 }

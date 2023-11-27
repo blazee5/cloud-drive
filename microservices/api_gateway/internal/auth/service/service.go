@@ -31,7 +31,7 @@ func (s *Service) SignUp(ctx context.Context, input domain.SignUpRequest) (strin
 		return "", err
 	}
 
-	return res.GetId(), nil
+	return res.GetID(), nil
 }
 
 func (s *Service) SignIn(ctx context.Context, input domain.SignInRequest) (string, error) {

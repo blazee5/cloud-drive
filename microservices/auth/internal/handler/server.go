@@ -25,7 +25,7 @@ func (s *Server) SignUp(ctx context.Context, in *pb.SignUpRequest) (*pb.UserResp
 		return nil, err
 	}
 
-	return &pb.UserResponse{Id: id}, nil
+	return &pb.UserResponse{ID: id}, nil
 }
 
 func (s *Server) SignIn(ctx context.Context, in *pb.SignInRequest) (*pb.Token, error) {

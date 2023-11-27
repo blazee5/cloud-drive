@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	pb "github.com/blazee5/cloud-drive/microservices/files/api/v1"
 	"github.com/blazee5/cloud-drive/microservices/files/ent"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/storage/aws"
 	"github.com/blazee5/cloud-drive/microservices/files/internal/storage/postgres"
@@ -14,14 +15,19 @@ type Storage struct {
 }
 
 type PostgresStorage interface {
-	Create(ctx context.Context, fileName, userId string) (int, error)
-	GetById(ctx context.Context, fileName string) (*ent.File, error)
-	AddCount(ctx context.Context, fileName string) error
+	GetAllByID(ctx context.Context, userID string) ([]*pb.FileInfo, error)
+	GetByID(ctx context.Context, ID int) (*ent.File, error)
+	Create(ctx context.Context, fileName, userID string) (int, error)
+	AddCount(ctx context.Context, ID int) error
+	Update(ctx context.Context, ID int, input *pb.UpdateFileRequest) error
+	Delete(ctx context.Context, ID int) error
 }
 
 type AwsStorage interface {
 	SaveFile(ctx context.Context, bucket, fileName, contentType string, chunk []byte) error
 	DownloadFile(ctx context.Context, bucket, fileName string) ([]byte, error)
+	UpdateFile(ctx context.Context, bucket, oldName, newName string) error
+	DeleteFile(ctx context.Context, bucket, fileName string) error
 }
 
 func NewStorage(db *ent.Client, awsClient *minio.Client) *Storage {

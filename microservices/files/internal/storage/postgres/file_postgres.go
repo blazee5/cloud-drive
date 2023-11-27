@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	pb "github.com/blazee5/cloud-drive/microservices/files/api/v1"
 	"github.com/blazee5/cloud-drive/microservices/files/ent"
 	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
 )
@@ -14,18 +15,31 @@ func NewFileStorage(db *ent.Client) *FileStorage {
 	return &FileStorage{db: db}
 }
 
-func (s *FileStorage) Create(ctx context.Context, fileName string, userId string) (int, error) {
-	res, err := s.db.File.Create().SetName(fileName).SetUserID(userId).SetDownloadCount(0).Save(ctx)
+func (s *FileStorage) GetAllByID(ctx context.Context, userID string) ([]*pb.FileInfo, error) {
+	files, err := s.db.File.Query().Where(file.UserID(userID)).All(ctx)
 
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return res.ID, nil
+	customFiles := make([]*pb.FileInfo, 0)
+
+	for _, file := range files {
+		fileInfo := &pb.FileInfo{
+			Id:            int64(file.ID),
+			Name:          file.Name,
+			UserId:        file.UserID,
+			DownloadCount: int64(file.DownloadCount),
+		}
+
+		customFiles = append(customFiles, fileInfo)
+	}
+
+	return customFiles, nil
 }
 
-func (s *FileStorage) GetById(ctx context.Context, fileName string) (*ent.File, error) {
-	file, err := s.db.File.Query().Where(file.Name(fileName)).Only(ctx)
+func (s *FileStorage) GetByID(ctx context.Context, ID int) (*ent.File, error) {
+	file, err := s.db.File.Get(ctx, ID)
 
 	if err != nil {
 		return nil, err
@@ -34,8 +48,38 @@ func (s *FileStorage) GetById(ctx context.Context, fileName string) (*ent.File, 
 	return file, nil
 }
 
-func (s *FileStorage) AddCount(ctx context.Context, fileName string) error {
-	_, err := s.db.File.Update().Where(file.Name(fileName)).AddDownloadCount(1).Save(ctx)
+func (s *FileStorage) Create(ctx context.Context, fileName string, userID string) (int, error) {
+	res, err := s.db.File.Create().SetName(fileName).SetUserID(userID).SetDownloadCount(0).Save(ctx)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return res.ID, nil
+}
+
+func (s *FileStorage) AddCount(ctx context.Context, ID int) error {
+	_, err := s.db.File.UpdateOneID(ID).AddDownloadCount(1).Save(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *FileStorage) Update(ctx context.Context, ID int, input *pb.UpdateFileRequest) error {
+	_, err := s.db.File.UpdateOneID(ID).SetName(input.GetName()).Save(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *FileStorage) Delete(ctx context.Context, ID int) error {
+	err := s.db.File.DeleteOneID(ID).Exec(ctx)
 
 	if err != nil {
 		return err
