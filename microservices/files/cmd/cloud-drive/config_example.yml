@@ -1,0 +1,17 @@
+env: "dev"
+
+http_server:
+  host: "localhost"
+  port: "3002"
+
+db:
+  host: "localhost"
+  port: "5432"
+  user: "postgres"
+  db_name: "cloud-drive"
+
+aws:
+  endpoint: "127.0.0.1:9000"
+  user: "minio"
+  password: "minio123"
+  ssl: false
