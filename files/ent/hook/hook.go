@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/blazee5/cloud-drive/microservices/files/ent"
+	"github.com/blazee5/cloud-drive/files/ent"
 )
 
 // The FileFunc type is an adapter to allow the use of ordinary

@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
-	"github.com/blazee5/cloud-drive/microservices/files/ent"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent"
+	"github.com/blazee5/cloud-drive/files/ent/file"
 )
 
 type FileStorage struct {

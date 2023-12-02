@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/predicate"
+	"github.com/blazee5/cloud-drive/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/predicate"
 )
 
 // FileQuery is the builder for querying File entities.

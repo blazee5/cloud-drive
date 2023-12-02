@@ -9,12 +9,12 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/blazee5/cloud-drive/microservices/files/ent/migrate"
+	"github.com/blazee5/cloud-drive/files/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/file"
 )
 
 // Client is the client that holds all ent builders.

@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/files/internal/config"
+	"github.com/blazee5/cloud-drive/files/internal/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"log"

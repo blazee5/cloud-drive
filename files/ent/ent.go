@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/file"
 )
 
 // ent aliases to avoid import conflicts in user's code.

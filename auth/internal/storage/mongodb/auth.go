@@ -3,7 +3,7 @@ package mongodb
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/auth"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/auth"
+	"github.com/blazee5/cloud-drive/auth/internal/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

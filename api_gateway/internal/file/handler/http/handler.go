@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/domain"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/file"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/file"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/file"
 )
 
 // File is the model entity for the File schema.

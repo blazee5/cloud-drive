@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/clients/file/grpc"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/domain"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/clients/file/grpc"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
 	"go.uber.org/zap"
 	"io"
 	"mime/multipart"

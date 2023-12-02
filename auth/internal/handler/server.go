@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/blazee5/cloud-drive-protos/auth"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/service"
+	"github.com/blazee5/cloud-drive/auth/internal/service"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

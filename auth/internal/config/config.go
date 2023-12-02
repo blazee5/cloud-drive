@@ -11,7 +11,7 @@ type Config struct {
 	DBPort     string `yaml:"db_port" env:"DB_PORT" env-default:"27017"`
 	DBUser     string `yaml:"db_user" env:"DB_USER" env-default:""`
 	DBPassword string `yaml:"db_password" env:"DB_PASSWORD" env-default:""`
-	DBName     string `yaml:"db_name" env:"DB_NAME" env-default:"cloud-drive"`
+	DBName     string `yaml:"db_name" env:"DB_NAME" env-default:"files"`
 	HttpServer `yaml:"http_server"`
 }
 

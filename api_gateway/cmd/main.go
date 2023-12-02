@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/app"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/lib/logger"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/app"
+	"github.com/blazee5/cloud-drive/api_gateway/lib/logger"
 	"github.com/joho/godotenv"
 )
 

@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	pb "github.com/blazee5/cloud-drive-protos/auth"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/config"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/handler"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/service"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage/mongodb"
-	"github.com/blazee5/cloud-drive/microservices/auth/lib/logger"
+	"github.com/blazee5/cloud-drive/auth/internal/config"
+	"github.com/blazee5/cloud-drive/auth/internal/handler"
+	"github.com/blazee5/cloud-drive/auth/internal/service"
+	"github.com/blazee5/cloud-drive/auth/internal/storage"
+	"github.com/blazee5/cloud-drive/auth/internal/storage/mongodb"
+	"github.com/blazee5/cloud-drive/auth/lib/logger"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -23,7 +23,7 @@ func Run(cfg *config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	client := mongodb.NewMongoDB(ctx, cfg)
-	db := client.Database("cloud-drive")
+	db := client.Database("files")
 	storages := storage.NewStorage(db)
 	services := service.NewAuthService(log, storages)
 
@@ -52,7 +52,7 @@ func Run(cfg *config.Config) {
 
 	s.GracefulStop()
 
-	if err := client.Disconnect(ctx); err != nil {
+	if err = client.Disconnect(ctx); err != nil {
 		log.Infof("error while close db: %s", err)
 	}
 }

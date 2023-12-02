@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/blazee5/cloud-drive/microservices/files/ent/runtime.go
+// The schema-stitching logic is generated in github.com/blazee5/files/files/ent/runtime.go
 
 const (
 	Version = "v0.12.5"                                         // Version of ent codegen.

@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/predicate"
+	"github.com/blazee5/cloud-drive/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/predicate"
 )
 
 const (

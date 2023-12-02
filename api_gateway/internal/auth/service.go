@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/domain"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
 )
 
 type Service interface {

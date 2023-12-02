@@ -1,17 +1,27 @@
 package app
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/internal/server"
-	"github.com/gin-gonic/gin"
+	"context"
+	"github.com/blazee5/cloud-drive/api_gateway/internal/server"
 	"go.uber.org/zap"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func Run(log *zap.SugaredLogger) {
-	router := gin.Default()
+	srv := server.NewServer(log)
+	go func() {
+		if err := srv.Run(srv.InitRoutes()); err != nil {
+			log.Fatalf("Error while start server: %v", err)
+		}
+	}()
 
-	s := server.NewServer(log)
-	s.InitRoutes(router)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
 
-	router.Run(os.Getenv("PORT"))
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Infof("Error occured on server shutting down: %v", err)
+	}
 }

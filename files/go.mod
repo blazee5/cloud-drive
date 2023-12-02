@@ -1,4 +1,4 @@
-module github.com/blazee5/cloud-drive/microservices/files
+module github.com/blazee5/cloud-drive/files
 
 go 1.21.4
 

@@ -1,4 +1,4 @@
-module github.com/blazee5/cloud-drive/microservices/api_gateway
+module github.com/blazee5/cloud-drive/api_gateway
 
 go 1.21.4
 

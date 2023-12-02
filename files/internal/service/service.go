@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
-	"github.com/blazee5/cloud-drive/microservices/files/internal/models"
-	"github.com/blazee5/cloud-drive/microservices/files/internal/storage"
-	"github.com/blazee5/cloud-drive/microservices/files/lib/http_errors"
+	"github.com/blazee5/cloud-drive/files/internal/models"
+	"github.com/blazee5/cloud-drive/files/internal/storage"
+	"github.com/blazee5/cloud-drive/files/lib/http_errors"
 	"go.uber.org/zap"
 )
 

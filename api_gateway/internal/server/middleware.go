@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/api_gateway/lib/auth"
+	"github.com/blazee5/cloud-drive/api_gateway/lib/auth"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

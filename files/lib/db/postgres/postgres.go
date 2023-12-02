@@ -3,8 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/blazee5/cloud-drive/microservices/files/ent"
-	"github.com/blazee5/cloud-drive/microservices/files/internal/config"
+	"github.com/blazee5/cloud-drive/files/ent"
+	"github.com/blazee5/cloud-drive/files/internal/config"
 	_ "github.com/lib/pq"
 	"log"
 )

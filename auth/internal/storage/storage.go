@@ -3,8 +3,8 @@ package storage
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/auth"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/auth"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/storage/mongodb"
+	"github.com/blazee5/cloud-drive/auth/internal/auth"
+	"github.com/blazee5/cloud-drive/auth/internal/storage/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

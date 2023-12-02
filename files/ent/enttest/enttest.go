@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/blazee5/cloud-drive/microservices/files/ent"
+	"github.com/blazee5/cloud-drive/files/ent"
 	// required by schema hooks.
-	_ "github.com/blazee5/cloud-drive/microservices/files/ent/runtime"
+	_ "github.com/blazee5/cloud-drive/files/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/migrate"
+	"github.com/blazee5/cloud-drive/files/ent/migrate"
 )
 
 type (

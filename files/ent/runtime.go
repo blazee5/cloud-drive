@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/files/ent/file"
-	"github.com/blazee5/cloud-drive/microservices/files/ent/schema"
+	"github.com/blazee5/cloud-drive/files/ent/file"
+	"github.com/blazee5/cloud-drive/files/ent/schema"
 )
 
 // The init function reads all schema descriptors with runtime code

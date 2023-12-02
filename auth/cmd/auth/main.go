@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/app"
-	"github.com/blazee5/cloud-drive/microservices/auth/internal/config"
+	"github.com/blazee5/cloud-drive/auth/internal/app"
+	"github.com/blazee5/cloud-drive/auth/internal/config"
 )
 
 func main() {
