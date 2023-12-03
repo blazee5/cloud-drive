@@ -7,7 +7,6 @@ import (
 	"github.com/blazee5/cloud-drive/auth/internal/config"
 	"github.com/blazee5/cloud-drive/auth/internal/handler"
 	"github.com/blazee5/cloud-drive/auth/internal/service"
-	"github.com/blazee5/cloud-drive/auth/internal/storage"
 	"github.com/blazee5/cloud-drive/auth/internal/storage/mongodb"
 	"github.com/blazee5/cloud-drive/auth/lib/logger"
 	"google.golang.org/grpc"
@@ -23,8 +22,8 @@ func Run(cfg *config.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	client := mongodb.NewMongoDB(ctx, cfg)
-	db := client.Database("files")
-	storages := storage.NewStorage(db)
+	db := client.Database(cfg.DBName)
+	storages := mongodb.NewAuthStorage(db)
 	services := service.NewAuthService(log, storages)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))

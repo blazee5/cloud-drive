@@ -13,7 +13,7 @@ func (s *Server) UserMiddleware(c *gin.Context) {
 	header := c.GetHeader("Authorization")
 	if header == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "empty auth header",
+			"message": "empty models header",
 		})
 		return
 	}
@@ -22,7 +22,7 @@ func (s *Server) UserMiddleware(c *gin.Context) {
 
 	if len(headerParts) != 2 {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "invalid auth header",
+			"message": "invalid models header",
 		})
 		return
 	}

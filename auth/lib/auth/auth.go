@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"math/big"
 	"time"
 )
 
@@ -11,6 +13,7 @@ const (
 	signingKey = "AfdJ!@hj1#$#jhskFJFSkdfl"
 	tokenTTL   = 12 * time.Hour
 	salt       = "kaSDFklj$fds@#"
+	codeLength = 8
 )
 
 type tokenClaims struct {
@@ -35,4 +38,19 @@ func GenerateHashPassword(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func GenerateRandomCode() (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var result string
+
+	for i := 0; i < codeLength; i++ {
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		result += string(charset[randomIndex.Int64()])
+	}
+
+	return result, nil
 }
