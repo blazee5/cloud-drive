@@ -47,7 +47,7 @@ func NewAuthServiceClient(log *zap.SugaredLogger) pb.AuthServiceClient {
 	)
 
 	if err != nil {
-		log.Fatalf("error while connect to models client: %s", err)
+		log.Fatalf("error while connect to auth client: %s", err)
 	}
 
 	return pb.NewAuthServiceClient(cc)
