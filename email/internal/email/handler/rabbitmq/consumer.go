@@ -5,6 +5,10 @@ import (
 	"github.com/blazee5/cloud-drive/email/internal/email"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
+	"log"
+	"os"
+	"strconv"
 )
 
 type Consumer struct {
@@ -16,19 +20,50 @@ func NewConsumer(log *zap.SugaredLogger, service email.Service) *Consumer {
 	return &Consumer{log: log, service: service}
 }
 
-func (c *Consumer) RunConsumer(ctx context.Context, ch <-chan amqp.Delivery) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case msg, ok := <-ch:
-			if !ok {
-				c.log.Infof("channel is closed")
-			}
+func (c *Consumer) ConsumeQueue(ctx context.Context, ch *amqp.Channel) error {
+	workers, err := strconv.Atoi(os.Getenv("WORKERS_COUNT"))
 
-			if err := c.service.SendEmail(string(msg.Body)); err != nil {
-				c.log.Infof("error while send email: %v", err)
-				continue
+	if err != nil {
+		return err
+	}
+
+	msgs, err := ch.Consume(
+		os.Getenv("RABBITMQ_QUEUE"),
+		os.Getenv("RABBITMQ_CONSUMER"),
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	eg, ctx := errgroup.WithContext(ctx)
+	for i := 0; i <= workers; i++ {
+		eg.Go(c.RunConsumer(ctx, msgs))
+	}
+
+	if err != nil {
+		log.Printf("error: %v", err)
+	}
+
+	return eg.Wait()
+}
+
+func (c *Consumer) RunConsumer(ctx context.Context, ch <-chan amqp.Delivery) func() error {
+	return func() error {
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case msg, ok := <-ch:
+				if !ok {
+					c.log.Infof("channel is closed")
+				}
+
+				if err := c.service.SendEmail(string(msg.Body)); err != nil {
+					c.log.Infof("error while send email: %v", err)
+					continue
+				}
 			}
 		}
 	}

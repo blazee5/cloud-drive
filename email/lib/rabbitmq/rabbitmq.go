@@ -1,8 +1,6 @@
 package rabbitmq
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -52,32 +50,4 @@ func NewQueueConn(ch *amqp.Channel) (*amqp.Queue, error) {
 	}
 
 	return &q, nil
-}
-
-func PublishMessage(ctx context.Context, message string, ch *amqp.Channel, q *amqp.Queue) error {
-	err := ch.PublishWithContext(ctx,
-		"",
-		q.Name,
-		false,
-		false,
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(message),
-		})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func NewConsumer(ctx context.Context, ch *amqp.Channel, q *amqp.Queue, consumeName string) (<-chan amqp.Delivery, error) {
-	msgs, err := ch.Consume(q.Name, consumeName, false, false, false, false, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return msgs, errors.New("")
 }
