@@ -6,9 +6,11 @@ import (
 	pb "github.com/blazee5/cloud-drive-protos/auth"
 	"github.com/blazee5/cloud-drive/auth/internal/config"
 	"github.com/blazee5/cloud-drive/auth/internal/handler"
+	producer "github.com/blazee5/cloud-drive/auth/internal/rabbitmq"
 	"github.com/blazee5/cloud-drive/auth/internal/service"
 	"github.com/blazee5/cloud-drive/auth/internal/storage/mongodb"
 	"github.com/blazee5/cloud-drive/auth/lib/logger"
+	"github.com/blazee5/cloud-drive/auth/lib/rabbitmq"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -24,9 +26,18 @@ func Run(cfg *config.Config) {
 	client := mongodb.NewMongoDB(ctx, cfg)
 	db := client.Database(cfg.DBName)
 	storages := mongodb.NewAuthStorage(db)
-	services := service.NewAuthService(log, storages)
+	rabbitConn := rabbitmq.NewRabbitMQConn(cfg)
+	msgProducer := producer.NewProducer(log, rabbitConn)
+	services := service.NewAuthService(log, storages, msgProducer)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Port))
+	err := msgProducer.InitProducer(cfg)
+
+	if err != nil {
+		log.Infof("error while init producer: %v", err)
+		cancel()
+	}
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.HttpServer.Port))
 	if err != nil {
 		log.Info("failed to listen: %v", err)
 	}

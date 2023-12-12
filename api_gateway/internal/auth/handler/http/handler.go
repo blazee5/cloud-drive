@@ -5,6 +5,8 @@ import (
 	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"net/http"
 )
 
@@ -64,5 +66,35 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+	})
+}
+
+func (h *Handler) ActivateAccount(c *gin.Context) {
+	code := c.Query("code")
+
+	res, err := h.authService.ActivateAccount(c, code)
+
+	st, ok := status.FromError(err)
+
+	if ok {
+		if st.Code() == codes.NotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "code not found",
+			})
+			return
+		}
+	}
+
+	if err != nil {
+		h.log.Infof("error while activate account: %v", err)
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": res,
 	})
 }

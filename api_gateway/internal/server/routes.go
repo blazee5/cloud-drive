@@ -43,6 +43,7 @@ func (s *Server) InitRoutes() *gin.Engine {
 	{
 		auth.POST("/signup", authHandlers.SignUp)
 		auth.POST("/signin", authHandlers.SignIn)
+		auth.GET("/activate", authHandlers.ActivateAccount)
 	}
 
 	api := router.Group("/api")

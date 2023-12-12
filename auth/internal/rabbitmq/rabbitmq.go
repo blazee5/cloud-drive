@@ -2,65 +2,46 @@ package rabbitmq
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/blazee5/cloud-drive/auth/internal/config"
+	"github.com/blazee5/cloud-drive/auth/lib/rabbitmq"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
-	"log"
 )
 
-func NewRabbitMQConn(cfg *config.Config) *amqp.Connection {
-	connAddr := fmt.Sprintf(
-		"amqp://%s:%s@%s:%s/",
-		cfg.RabbitMQUser,
-		cfg.RabbitMQPassword,
-		cfg.RabbitMQHost,
-		cfg.RabbitMQPort,
-	)
-
-	conn, err := amqp.Dial(connAddr)
-
-	if err != nil {
-		log.Fatalf("error connect to rabbitmq: %v", err)
-	}
-
-	return conn
+type Producer struct {
+	log   *zap.SugaredLogger
+	conn  *amqp.Connection
+	ch    *amqp.Channel
+	queue *amqp.Queue
 }
 
-func NewChannelConn(conn *amqp.Connection, log *zap.SugaredLogger) (*amqp.Channel, error) {
-	ch, err := conn.Channel()
-
-	if err != nil {
-		log.Infof("failed to create a channel in rabbitmq: %v", err)
-		return nil, err
-	}
-
-	return ch, nil
+func NewProducer(log *zap.SugaredLogger, conn *amqp.Connection) *Producer {
+	return &Producer{log: log, conn: conn}
 }
 
-func NewQueueConn(ch *amqp.Channel, log *zap.SugaredLogger) (*amqp.Queue, error) {
-	q, err := ch.QueueDeclare(
-		"hello",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
+func (p *Producer) InitProducer(cfg *config.Config) error {
+	ch, err := rabbitmq.NewChannelConn(p.conn)
 
 	if err != nil {
-		log.Infof("failed to declare a queue: %v", err)
-		return nil, err
+		return err
 	}
 
-	return &q, nil
+	q, err := rabbitmq.NewQueueConn(ch, cfg)
+
+	if err != nil {
+		return err
+	}
+
+	p.ch = ch
+	p.queue = q
+
+	return nil
 }
 
-func PublishMessage(ctx context.Context, message string, ch *amqp.Channel, q *amqp.Queue) error {
-	err := ch.PublishWithContext(ctx,
+func (p *Producer) PublishMessage(ctx context.Context, message string) error {
+	err := p.ch.PublishWithContext(ctx,
 		"",
-		q.Name,
+		p.queue.Name,
 		false,
 		false,
 		amqp.Publishing{
@@ -73,14 +54,4 @@ func PublishMessage(ctx context.Context, message string, ch *amqp.Channel, q *am
 	}
 
 	return nil
-}
-
-func NewConsumer(ctx context.Context, ch *amqp.Channel, q *amqp.Queue, consumeName string) (<-chan amqp.Delivery, error) {
-	msgs, err := ch.Consume(q.Name, consumeName, false, false, false, false, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return msgs, errors.New("")
 }

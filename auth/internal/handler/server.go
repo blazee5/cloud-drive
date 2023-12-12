@@ -43,19 +43,19 @@ func (s *Server) SignIn(ctx context.Context, in *auth.SignInRequest) (*auth.Toke
 	return &auth.Token{Token: token}, nil
 }
 
-func (s *Server) ValidateCode(ctx context.Context, in *auth.ValidateCodeRequest) (*auth.ValidateCodeResponse, error) {
+func (s *Server) ValidateAccount(ctx context.Context, in *auth.ValidateAccountRequest) (*auth.ValidateAccountResponse, error) {
 	err := s.service.ValidateEmail(ctx, in)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return &auth.ValidateCodeResponse{}, status.Errorf(codes.NotFound, "invalid code")
+		return &auth.ValidateAccountResponse{}, status.Errorf(codes.NotFound, "invalid code")
 	}
 
 	if err != nil {
 		s.log.Infof("error while validate code: %v", err)
-		return &auth.ValidateCodeResponse{}, status.Errorf(codes.Internal, "server error")
+		return &auth.ValidateAccountResponse{}, status.Errorf(codes.Internal, "server error")
 	}
 
-	return &auth.ValidateCodeResponse{
+	return &auth.ValidateAccountResponse{
 		Status: "success",
 	}, nil
 }

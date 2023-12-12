@@ -55,5 +55,18 @@ func Run(log *zap.SugaredLogger) {
 			log.Infof("error while close rabbitmq conn: %v", err)
 
 		}
+	case <-ctx.Done():
+		err = ch.Close()
+
+		if err != nil {
+			log.Infof("error while close channel: %v", err)
+		}
+
+		err = conn.Close()
+
+		if err != nil {
+			log.Infof("error while close rabbitmq conn: %v", err)
+
+		}
 	}
 }

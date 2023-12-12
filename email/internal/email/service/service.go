@@ -23,7 +23,8 @@ func (s *Service) SendEmail(msg string) error {
 		s.log.Infof("error while unmarshal message: %v", err)
 		return err
 	}
-	if email.Type == "2fa" {
+
+	if email.Type == "activate" {
 		err = mail.SendMail(email.To, email.Message)
 
 		if err != nil {

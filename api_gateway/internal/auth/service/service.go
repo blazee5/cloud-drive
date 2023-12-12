@@ -47,14 +47,14 @@ func (s *Service) SignIn(ctx context.Context, input domain.SignInRequest) (strin
 	return res.GetToken(), nil
 }
 
-func (s *Service) ValidateUser(ctx context.Context, token string) (string, error) {
-	res, err := s.api.ValidateUser(ctx, &pb.TokenRequest{
-		Token: token,
+func (s *Service) ActivateAccount(ctx context.Context, code string) (string, error) {
+	res, err := s.api.ValidateAccount(ctx, &pb.ValidateAccountRequest{
+		Code: code,
 	})
 
 	if err != nil {
 		return "", err
 	}
 
-	return res.GetId(), nil
+	return res.GetStatus(), nil
 }

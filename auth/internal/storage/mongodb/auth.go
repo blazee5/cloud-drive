@@ -4,7 +4,6 @@ import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/auth"
 	"github.com/blazee5/cloud-drive/auth/internal/models"
-	"github.com/blazee5/cloud-drive/auth/lib/auth"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +18,7 @@ func NewAuthStorage(db *mongo.Database) *AuthStorage {
 	return &AuthStorage{db: db}
 }
 
-func (s *AuthStorage) SignUp(ctx context.Context, input *pb.SignUpRequest) (string, error) {
+func (s *AuthStorage) SignUp(ctx context.Context, input *pb.SignUpRequest, code string) (string, error) {
 	res, err := s.db.Collection("users").InsertOne(ctx, models.User{
 		Username:    input.Username,
 		Email:       input.Email,
@@ -33,15 +32,13 @@ func (s *AuthStorage) SignUp(ctx context.Context, input *pb.SignUpRequest) (stri
 
 	userID := res.InsertedID.(primitive.ObjectID)
 
-	code, err := auth.GenerateRandomCode()
-
 	if err != nil {
 		return "", err
 	}
 
 	_, err = s.db.Collection("activation_codes").InsertOne(ctx, models.ActivationCode{
-		UserID:     userID,
 		Code:       code,
+		UserID:     userID,
 		ExpireDate: time.Now().Add(time.Hour * 2),
 	})
 
@@ -69,17 +66,10 @@ func (s *AuthStorage) VerifyUser(ctx context.Context, input *pb.SignInRequest) (
 	return user, nil
 }
 
-func (s *AuthStorage) GetActivationCode(ctx context.Context, userID, code string) (models.ActivationCode, error) {
+func (s *AuthStorage) GetActivationCode(ctx context.Context, code string) (models.ActivationCode, error) {
 	var activationCode models.ActivationCode
 
-	objectID, err := primitive.ObjectIDFromHex(userID)
-
-	if err != nil {
-		return models.ActivationCode{}, err
-	}
-
-	err = s.db.Collection("activation_codes").FindOne(ctx, bson.D{
-		{"user_id", objectID},
+	err := s.db.Collection("activation_codes").FindOne(ctx, bson.D{
 		{"code", code},
 	}).Decode(&activationCode)
 

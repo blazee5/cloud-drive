@@ -6,7 +6,6 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
-	"log"
 	"os"
 	"strconv"
 )
@@ -24,6 +23,8 @@ func (c *Consumer) ConsumeQueue(ctx context.Context, ch *amqp.Channel) error {
 	workers, err := strconv.Atoi(os.Getenv("WORKERS_COUNT"))
 
 	if err != nil {
+		c.log.Infof("invalid workers count in env: %v", err)
+
 		return err
 	}
 
@@ -43,7 +44,7 @@ func (c *Consumer) ConsumeQueue(ctx context.Context, ch *amqp.Channel) error {
 	}
 
 	if err != nil {
-		log.Printf("error: %v", err)
+		c.log.Infof("error in workers pool: %v", err)
 	}
 
 	return eg.Wait()

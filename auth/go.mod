@@ -3,8 +3,9 @@ module github.com/blazee5/cloud-drive/auth
 go 1.21.4
 
 require (
-	github.com/blazee5/cloud-drive-protos v0.0.4
+	github.com/blazee5/cloud-drive-protos v0.0.5
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/google/uuid v1.3.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/rabbitmq/amqp091-go v1.9.0
 	go.mongodb.org/mongo-driver v1.13.0
