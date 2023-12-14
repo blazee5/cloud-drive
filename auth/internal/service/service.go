@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	pb "github.com/blazee5/cloud-drive-protos/auth"
+	"github.com/blazee5/cloud-drive/auth/internal/config"
 	"github.com/blazee5/cloud-drive/auth/internal/domain"
 	"github.com/blazee5/cloud-drive/auth/internal/rabbitmq"
 	"github.com/blazee5/cloud-drive/auth/internal/storage"
@@ -25,10 +26,11 @@ type AuthService struct {
 	log      *zap.SugaredLogger
 	storage  storage.Storage
 	producer *rabbitmq.Producer
+	cfg      *config.Config
 }
 
-func NewAuthService(log *zap.SugaredLogger, storage storage.Storage, producer *rabbitmq.Producer) *AuthService {
-	return &AuthService{log: log, storage: storage, producer: producer}
+func NewAuthService(log *zap.SugaredLogger, storage storage.Storage, producer *rabbitmq.Producer, cfg *config.Config) *AuthService {
+	return &AuthService{log: log, storage: storage, producer: producer, cfg: cfg}
 }
 
 func (s *AuthService) SignUp(ctx context.Context, input *pb.SignUpRequest) (string, error) {
@@ -49,11 +51,10 @@ func (s *AuthService) SignUp(ctx context.Context, input *pb.SignUpRequest) (stri
 	email := domain.Email{
 		Type:    "activate",
 		To:      input.Email,
-		Message: "http://localhost:3000/auth/activate?code=" + code.String(),
+		Message: fmt.Sprintf("%s/auth/activate?code=%s", s.cfg.HttpServer.GatewayURL, code.String()),
 	}
 
 	msg, err := json.Marshal(&email)
-	fmt.Println(string(msg))
 
 	if err != nil {
 		return "", err

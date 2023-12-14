@@ -28,7 +28,7 @@ func Run(cfg *config.Config) {
 	storages := mongodb.NewAuthStorage(db)
 	rabbitConn := rabbitmq.NewRabbitMQConn(cfg)
 	msgProducer := producer.NewProducer(log, rabbitConn)
-	services := service.NewAuthService(log, storages, msgProducer)
+	services := service.NewAuthService(log, storages, msgProducer, cfg)
 
 	err := msgProducer.InitProducer(cfg)
 

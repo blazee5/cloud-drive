@@ -45,8 +45,9 @@ func (p *Producer) PublishMessage(ctx context.Context, message string) error {
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(message),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(message),
 		})
 
 	if err != nil {

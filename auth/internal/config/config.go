@@ -17,8 +17,9 @@ type Config struct {
 }
 
 type HttpServer struct {
-	Host string `yaml:"host" env:"HOST" env-default:"localhost"`
-	Port string `yaml:"port" env:"PORT" env-default:"3000"`
+	GatewayURL string `yaml:"gateway_url" env:"GATEWAY_URL" env-default:"http://localhost:3000"`
+	Host       string `yaml:"host" env:"HOST" env-default:"localhost"`
+	Port       string `yaml:"port" env:"PORT" env-default:"3001"`
 }
 
 type RabbitMQ struct {

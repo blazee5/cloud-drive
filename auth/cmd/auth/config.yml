@@ -6,5 +6,12 @@ db_password: ""
 db_name: "cloud-drive"
 
 http_server:
+  gateway_url: "http://localhost:3000"
   host: "localhost"
   port: "3001"
+
+rabbitmq:
+  user: "guest"
+  password: "guest"
+  host: "localhost"
+  port: "5672"
