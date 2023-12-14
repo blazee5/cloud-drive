@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/files/internal/config"
@@ -20,9 +21,9 @@ import (
 func Run(cfg *config.Config) {
 	log := logger.NewLogger()
 
+	ctx, cancel := context.WithCancel(context.Background())
 	awsClient := aws.NewAWSClient(cfg)
-
-	db := postgres.New(cfg)
+	db := postgres.NewPgxConn(ctx, cfg)
 
 	storages := storage.NewStorage(db, awsClient)
 	services := service.NewFileService(log, storages)
@@ -48,8 +49,7 @@ func Run(cfg *config.Config) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
+	defer cancel()
 	s.GracefulStop()
-	if err = db.Close(); err != nil {
-		log.Infof("error while close db conn: %v", err)
-	}
+	db.Close()
 }

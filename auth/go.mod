@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.5.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/rabbitmq/amqp091-go v1.9.0
-	go.mongodb.org/mongo-driver v1.13.0
+	go.mongodb.org/mongo-driver v1.13.1
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.60.0
 )

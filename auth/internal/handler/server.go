@@ -35,6 +35,10 @@ func (s *Server) SignUp(ctx context.Context, in *auth.SignUpRequest) (*auth.User
 func (s *Server) SignIn(ctx context.Context, in *auth.SignInRequest) (*auth.Token, error) {
 	token, err := s.service.GenerateToken(ctx, in)
 
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return &auth.Token{}, status.Errorf(codes.NotFound, "invalid credentials")
+	}
+
 	if err != nil {
 		s.log.Infof("error while signin: %v", err)
 		return &auth.Token{}, status.Errorf(codes.Internal, "server error")

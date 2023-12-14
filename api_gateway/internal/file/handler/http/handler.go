@@ -23,11 +23,29 @@ func NewHandler(log *zap.SugaredLogger, fileService file.Service) *Handler {
 func (h *Handler) GetUserFiles(c *gin.Context) {
 	userID, ok := c.Get("userID")
 
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid page query",
+		})
+		return
+	}
+
+	size, err := strconv.Atoi(c.DefaultQuery("size", "0"))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid size query",
+		})
+		return
+	}
+
 	if ok != true {
 		return
 	}
 
-	files, err := h.fileService.GetFiles(c, userID.(string))
+	files, err := h.fileService.GetFiles(c, userID.(string), page, size)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -98,7 +116,7 @@ func (h *Handler) DownloadFile(c *gin.Context) {
 	}
 
 	if err != nil {
-		h.log.Infof("error while upload file: %v", err)
+		h.log.Infof("error while download file: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "server error",
 		})

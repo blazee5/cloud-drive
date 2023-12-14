@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
+	"github.com/blazee5/cloud-drive/files/internal/domain"
 	"github.com/blazee5/cloud-drive/files/internal/models"
 	"github.com/blazee5/cloud-drive/files/internal/storage"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
@@ -10,9 +11,9 @@ import (
 )
 
 type Service interface {
-	GetFilesByID(ctx context.Context, userID string) ([]*pb.FileInfo, error)
-	Upload(ctx context.Context, fileName, userID string, chunk []byte, contentType string) (int, error)
-	Download(ctx context.Context, userID string, ID int) (*models.File, error)
+	GetFilesByID(ctx context.Context, userID string, input *pb.GetFilesRequest) (models.FileList, error)
+	Upload(ctx context.Context, fileName, userID, contentType string, chunk []byte) (int, error)
+	Download(ctx context.Context, userID string, ID int) (*domain.File, error)
 	Update(ctx context.Context, userID string, ID int, input *pb.UpdateFileRequest) error
 	Delete(ctx context.Context, userID string, ID int) error
 }
@@ -26,11 +27,11 @@ func NewFileService(log *zap.SugaredLogger, repo *storage.Storage) *FileService 
 	return &FileService{log: log, repo: repo}
 }
 
-func (s *FileService) GetFilesByID(ctx context.Context, userID string) ([]*pb.FileInfo, error) {
-	return s.repo.PostgresStorage.GetAllByID(ctx, userID)
+func (s *FileService) GetFilesByID(ctx context.Context, userID string, input *pb.GetFilesRequest) (models.FileList, error) {
+	return s.repo.PostgresStorage.GetAllByID(ctx, userID, input)
 }
 
-func (s *FileService) Upload(ctx context.Context, fileName string, userID string, chunk []byte, contentType string) (int, error) {
+func (s *FileService) Upload(ctx context.Context, fileName, userID, contentType string, chunk []byte) (int, error) {
 	err := s.repo.AwsStorage.SaveFile(ctx, userID, fileName, contentType, chunk)
 
 	if err != nil {
@@ -40,7 +41,7 @@ func (s *FileService) Upload(ctx context.Context, fileName string, userID string
 	return s.repo.PostgresStorage.Create(ctx, userID, fileName, contentType)
 }
 
-func (s *FileService) Download(ctx context.Context, userID string, ID int) (*models.File, error) {
+func (s *FileService) Download(ctx context.Context, userID string, ID int) (*domain.File, error) {
 	file, err := s.repo.GetByID(ctx, ID)
 
 	if err != nil {
@@ -59,7 +60,7 @@ func (s *FileService) Download(ctx context.Context, userID string, ID int) (*mod
 		s.log.Infof("error while add download count: %v", err)
 	}
 
-	return &models.File{
+	return &domain.File{
 		ID:          file.ID,
 		Name:        file.Name,
 		UserID:      file.UserID,

@@ -3,23 +3,19 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/blazee5/cloud-drive/files/ent"
 	"github.com/blazee5/cloud-drive/files/internal/config"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 	"log"
 )
 
-func New(cfg *config.Config) *ent.Client {
-	client, err := ent.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port, cfg.DB.DBName))
+func NewPgxConn(ctx context.Context, cfg *config.Config) *pgxpool.Pool {
+	db, err := pgxpool.New(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port, cfg.DB.DBName, cfg.DB.SSLMode))
 
 	if err != nil {
 		log.Fatalf("error while connect to postgres: %v", err)
 	}
 
-	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
-
-	return client
+	return db
 }

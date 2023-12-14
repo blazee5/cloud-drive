@@ -15,11 +15,12 @@ type HTTPServer struct {
 }
 
 type DB struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	User     string `yaml:"user"`
-	DBName   string `yaml:"db_name"`
+	Host     string `yaml:"host" env-default:"localhost"`
+	Port     string `yaml:"port" env-default:"5432"`
+	User     string `yaml:"user" env-default:"postgres"`
+	DBName   string `yaml:"db_name" env-default:"files"`
 	Password string `yaml:"password"`
+	SSLMode  bool   `yaml:"ssl_mode" env-default:"false"`
 }
 
 type AWS struct {

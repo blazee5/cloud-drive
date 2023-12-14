@@ -2,9 +2,9 @@ package grpc
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	pb "github.com/blazee5/cloud-drive-protos/files"
-	"github.com/blazee5/cloud-drive/files/ent"
 	"github.com/blazee5/cloud-drive/files/internal/service"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
 	"go.uber.org/zap"
@@ -22,20 +22,32 @@ func NewServer(log *zap.SugaredLogger, service service.Service) *Server {
 	return &Server{log: log, service: service}
 }
 
-func (s *Server) GetFiles(ctx context.Context, input *pb.UserRequest) (*pb.FileResponse, error) {
+func (s *Server) GetFiles(ctx context.Context, input *pb.GetFilesRequest) (*pb.GetFileResponse, error) {
 	if input.GetUserId() == "" {
-		return &pb.FileResponse{}, status.Errorf(codes.InvalidArgument, "user_id is required field")
+		return &pb.GetFileResponse{}, status.Errorf(codes.InvalidArgument, "user_id is required field")
 	}
 
-	files, err := s.service.GetFilesByID(ctx, input.GetUserId())
+	if input.GetSize() == 0 {
+		input.Size = 5
+	}
+
+	if input.GetPage() == 0 {
+		input.Page = 1
+	}
+
+	files, err := s.service.GetFilesByID(ctx, input.GetUserId(), input)
 
 	if err != nil {
 		s.log.Infof("error while get user files: %v", err)
-		return &pb.FileResponse{}, status.Errorf(codes.Internal, "server error")
+		return &pb.GetFileResponse{}, status.Errorf(codes.Internal, "server error")
 	}
 
-	return &pb.FileResponse{
-		Files: files,
+	return &pb.GetFileResponse{
+		Total:      int64(files.Total),
+		TotalPages: int64(files.TotalPages),
+		Page:       int64(files.Page),
+		Size:       int64(files.Size),
+		Files:      files.Files,
 	}, nil
 }
 
@@ -52,7 +64,7 @@ func (s *Server) UploadFile(ctx context.Context, input *pb.UploadRequest) (*pb.U
 		return &pb.UploadResponse{}, status.Errorf(codes.InvalidArgument, "chunk is required field")
 	}
 
-	id, err := s.service.Upload(ctx, input.GetFileName(), input.GetUserId(), input.GetChunk(), input.GetFileType())
+	id, err := s.service.Upload(ctx, input.GetFileName(), input.GetUserId(), input.GetFileType(), input.GetChunk())
 
 	if err != nil {
 		s.log.Infof("error while upload file: %v", err)
@@ -65,7 +77,7 @@ func (s *Server) UploadFile(ctx context.Context, input *pb.UploadRequest) (*pb.U
 func (s *Server) DownloadFile(ctx context.Context, input *pb.FileRequest) (*pb.File, error) {
 	file, err := s.service.Download(ctx, input.GetUserId(), int(input.GetId()))
 
-	if ent.IsNotFound(err) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return &pb.File{}, status.Error(codes.NotFound, "file not found")
 	}
 
@@ -90,7 +102,7 @@ func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*
 		return &pb.SuccessResponse{}, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	if ent.IsNotFound(err) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return &pb.SuccessResponse{}, status.Error(codes.NotFound, "file not found")
 	}
 
@@ -107,7 +119,7 @@ func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*
 func (s *Server) DeleteFile(ctx context.Context, input *pb.FileRequest) (*pb.SuccessResponse, error) {
 	err := s.service.Delete(ctx, input.GetUserId(), int(input.GetId()))
 
-	if ent.IsNotFound(err) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return &pb.SuccessResponse{}, status.Errorf(codes.NotFound, "not found")
 	}
 

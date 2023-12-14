@@ -56,6 +56,17 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	token, err := h.authService.SignIn(c, input)
 
+	st, ok := status.FromError(err)
+
+	if ok {
+		if st.Code() == codes.NotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "invalid credentials",
+			})
+			return
+		}
+	}
+
 	if err != nil {
 		h.log.Infof("error while sign in: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

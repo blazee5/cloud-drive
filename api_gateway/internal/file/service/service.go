@@ -23,14 +23,18 @@ func NewService(log *zap.SugaredLogger) *Service {
 	}
 }
 
-func (s *Service) GetFiles(ctx context.Context, userID string) ([]*pb.FileInfo, error) {
-	files, err := s.api.GetFiles(ctx, &pb.UserRequest{UserId: userID})
+func (s *Service) GetFiles(ctx context.Context, userID string, page, size int) (*pb.GetFileResponse, error) {
+	files, err := s.api.GetFiles(ctx, &pb.GetFilesRequest{
+		UserId: userID,
+		Page:   int64(page),
+		Size:   int64(size),
+	})
 
 	if err != nil {
-		return files.GetFiles(), err
+		return nil, err
 	}
 
-	return files.GetFiles(), nil
+	return files, nil
 }
 
 func (s *Service) UploadFile(ctx context.Context, userID string, fileHeader *multipart.FileHeader) (int, error) {
