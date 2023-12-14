@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE files(
-    id SERIAL,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     user_id VARCHAR(255) NOT NULL,
     content_type VARCHAR(255) NOT NULL,
