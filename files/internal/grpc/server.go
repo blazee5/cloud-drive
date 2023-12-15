@@ -7,6 +7,7 @@ import (
 	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/files/internal/service"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
+	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -102,7 +103,7 @@ func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*
 		return &pb.SuccessResponse{}, status.Errorf(codes.PermissionDenied, "permission denied")
 	}
 
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return &pb.SuccessResponse{}, status.Error(codes.NotFound, "file not found")
 	}
 
@@ -119,12 +120,12 @@ func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*
 func (s *Server) DeleteFile(ctx context.Context, input *pb.FileRequest) (*pb.SuccessResponse, error) {
 	err := s.service.Delete(ctx, input.GetUserId(), int(input.GetId()))
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return &pb.SuccessResponse{}, status.Errorf(codes.NotFound, "not found")
-	}
-
 	if errors.Is(err, http_errors.PermissionDenied) {
 		return &pb.SuccessResponse{}, status.Errorf(codes.PermissionDenied, "permission denied")
+	}
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return &pb.SuccessResponse{}, status.Errorf(codes.NotFound, "file not found")
 	}
 
 	if err != nil {

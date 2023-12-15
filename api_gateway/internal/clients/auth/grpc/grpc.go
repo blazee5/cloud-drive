@@ -29,7 +29,7 @@ func NewAuthServiceClient(log *zap.SugaredLogger) pb.AuthServiceClient {
 	}
 
 	retryOpts := []grpcretry.CallOption{
-		grpcretry.WithCodes(codes.NotFound, codes.Aborted, codes.DeadlineExceeded),
+		grpcretry.WithCodes(codes.Aborted, codes.DeadlineExceeded),
 		grpcretry.WithMax(uint(retries)),
 		grpcretry.WithPerRetryTimeout(timeout),
 	}

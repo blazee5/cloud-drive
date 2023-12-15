@@ -48,9 +48,7 @@ func (s *Server) UserMiddleware(c *gin.Context) {
 
 	if err != nil {
 		s.log.Error("error while validate token: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "server error",
-		})
+		c.JSON(http.StatusUnauthorized, err.Error())
 		return
 	}
 

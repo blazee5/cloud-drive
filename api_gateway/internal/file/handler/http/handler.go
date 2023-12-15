@@ -152,13 +152,15 @@ func (h *Handler) UpdateFile(c *gin.Context) {
 
 	err = h.fileService.UpdateFile(c, ID, userID.(string), input)
 
-	st, _ := status.FromError(err)
+	st, ok := status.FromError(err)
 
-	if st.Code() == codes.NotFound {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "file not found",
-		})
-		return
+	if ok {
+		if st.Code() == codes.NotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "file not found",
+			})
+			return
+		}
 	}
 
 	if err != nil {

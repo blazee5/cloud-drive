@@ -4,6 +4,7 @@ import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/files/internal/models"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"math"
@@ -78,7 +79,7 @@ func (s *FileStorage) GetAllByID(ctx context.Context, userID string, input *pb.G
 func (s *FileStorage) GetByID(ctx context.Context, ID int) (models.File, error) {
 	var file models.File
 
-	err := s.db.QueryRow(ctx, "SELECT id, name, user_id, content_type, download_count, created_at WHERE id = $1", ID).
+	err := s.db.QueryRow(ctx, "SELECT id, name, user_id, content_type, download_count, created_at FROM files WHERE id = $1", ID).
 		Scan(&file.ID, &file.Name, &file.UserID, &file.ContentType, &file.DownloadCount, &file.CreatedAt)
 
 	if err != nil {
@@ -111,24 +112,29 @@ func (s *FileStorage) AddCount(ctx context.Context, ID int) error {
 	return nil
 }
 
-func (s *FileStorage) Update(ctx context.Context, ID int, input *pb.UpdateFileRequest) error {
-	var file models.FileInfo
-
-	err := s.db.QueryRow(ctx, "UPDATE files SET name = $1 WHERE id = $1 RETURNING id, name, user_id, download_count, created_at", ID, input.Name).
-		Scan(&file.ID, &file.Name, &file.UserID, &file.DownloadCount, &file.CreatedAt)
+func (s *FileStorage) Update(ctx context.Context, ID int, name string) error {
+	res, err := s.db.Exec(ctx, "UPDATE files SET name = $1 WHERE id = $2 RETURNING id, name, user_id, download_count, created_at", name, ID)
 
 	if err != nil {
 		return err
+	}
+
+	if res.RowsAffected() != 1 {
+		return pgx.ErrNoRows
 	}
 
 	return nil
 }
 
 func (s *FileStorage) Delete(ctx context.Context, ID int) error {
-	_, err := s.db.Exec(ctx, "DELETE FROM files WHERE id = $1", ID)
+	res, err := s.db.Exec(ctx, "DELETE FROM files WHERE id = $1", ID)
 
 	if err != nil {
 		return err
+	}
+
+	if res.RowsAffected() != 1 {
+		return pgx.ErrNoRows
 	}
 
 	return nil

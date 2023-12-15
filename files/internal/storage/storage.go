@@ -20,7 +20,7 @@ type PostgresStorage interface {
 	GetByID(ctx context.Context, ID int) (models.File, error)
 	Create(ctx context.Context, userID, fileName, contentType string) (int, error)
 	AddCount(ctx context.Context, ID int) error
-	Update(ctx context.Context, ID int, input *pb.UpdateFileRequest) error
+	Update(ctx context.Context, ID int, name string) error
 	Delete(ctx context.Context, ID int) error
 }
 

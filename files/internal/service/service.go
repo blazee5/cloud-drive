@@ -8,6 +8,7 @@ import (
 	"github.com/blazee5/cloud-drive/files/internal/storage"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
 	"go.uber.org/zap"
+	"path/filepath"
 )
 
 type Service interface {
@@ -80,13 +81,15 @@ func (s *FileService) Update(ctx context.Context, userID string, ID int, input *
 		return http_errors.PermissionDenied
 	}
 
-	err = s.repo.AwsStorage.UpdateFile(ctx, userID, file.Name, input.GetName())
+	newFileName := input.GetName() + filepath.Ext(file.Name)
+
+	err = s.repo.AwsStorage.UpdateFile(ctx, userID, file.Name, newFileName)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.repo.PostgresStorage.Update(ctx, ID, input)
+	err = s.repo.PostgresStorage.Update(ctx, ID, newFileName)
 
 	if err != nil {
 		return err
