@@ -6,6 +6,7 @@ import (
 	authService "github.com/blazee5/cloud-drive/api_gateway/internal/auth/service"
 	fileHandler "github.com/blazee5/cloud-drive/api_gateway/internal/file/handler/http"
 	fileService "github.com/blazee5/cloud-drive/api_gateway/internal/file/service"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
@@ -35,6 +36,7 @@ func (s *Server) Run(handler http.Handler) error {
 
 func (s *Server) InitRoutes() *gin.Engine {
 	router := gin.New()
+	router.Use(cors.Default())
 
 	authServices := authService.NewService(s.log)
 	authHandlers := authHandler.NewHandler(s.log, authServices)

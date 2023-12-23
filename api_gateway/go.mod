@@ -1,15 +1,16 @@
 module github.com/blazee5/cloud-drive/api_gateway
 
-go 1.21.4
+go 1.21.5
 
 require (
-	github.com/blazee5/cloud-drive-protos v0.0.8
+	github.com/blazee5/cloud-drive-protos v0.0.9
+	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.26.0
-	google.golang.org/grpc v1.60.0
+	google.golang.org/grpc v1.60.1
 )
 
 require (
