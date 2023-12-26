@@ -8,7 +8,7 @@ import (
 )
 
 type Service interface {
-	GetFiles(ctx context.Context, userID string, page, size int) (*pb.GetFileResponse, error)
+	GetFiles(ctx context.Context, userID, orderBy, orderDir string, page, size int) (domain.FileList, error)
 	UploadFile(ctx context.Context, userID string, file *multipart.FileHeader) (int, error)
 	DownloadFile(ctx context.Context, ID int, userID string) (*pb.File, error)
 	UpdateFile(ctx context.Context, ID int, userID string, input domain.UpdateFileInput) error

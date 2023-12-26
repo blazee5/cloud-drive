@@ -23,18 +23,38 @@ func NewService(log *zap.SugaredLogger) *Service {
 	}
 }
 
-func (s *Service) GetFiles(ctx context.Context, userID string, page, size int) (*pb.GetFileResponse, error) {
-	files, err := s.api.GetFiles(ctx, &pb.GetFilesRequest{
-		UserId: userID,
-		Page:   int64(page),
-		Size:   int64(size),
+func (s *Service) GetFiles(ctx context.Context, userID, orderBy, orderDir string, page, size int) (domain.FileList, error) {
+	filesProto, err := s.api.GetFiles(ctx, &pb.GetFilesRequest{
+		UserId:   userID,
+		Page:     int64(page),
+		Size:     int64(size),
+		OrderBy:  orderBy,
+		OrderDir: orderDir,
 	})
 
 	if err != nil {
-		return nil, err
+		return domain.FileList{}, err
 	}
 
-	return files, nil
+	files := make([]domain.FileInfo, 0, len(filesProto.Files))
+
+	for _, file := range filesProto.Files {
+		files = append(files, domain.FileInfo{
+			ID:            int(file.Id),
+			Name:          file.Name,
+			UserID:        file.UserId,
+			DownloadCount: int(file.DownloadCount),
+			CreatedAt:     file.CreatedAt.AsTime(),
+		})
+	}
+
+	return domain.FileList{
+		Total:      int(filesProto.Total),
+		TotalPages: int(filesProto.TotalPages),
+		Page:       int(filesProto.Page),
+		Size:       int(filesProto.Size),
+		Files:      files,
+	}, nil
 }
 
 func (s *Service) UploadFile(ctx context.Context, userID string, fileHeader *multipart.FileHeader) (int, error) {

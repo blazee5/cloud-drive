@@ -36,6 +36,14 @@ func (s *Server) GetFiles(ctx context.Context, input *pb.GetFilesRequest) (*pb.G
 		input.Page = 1
 	}
 
+	if input.GetOrderBy() == "" {
+		input.OrderBy = "title"
+	}
+
+	if input.GetOrderDir() == "" {
+		input.OrderDir = "ASC"
+	}
+
 	files, err := s.service.GetFilesByID(ctx, input.GetUserId(), input)
 
 	if err != nil {

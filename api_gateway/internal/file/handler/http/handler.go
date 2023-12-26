@@ -25,6 +25,9 @@ func (h *Handler) GetUserFiles(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 
+	orderBy := c.DefaultQuery("sortBy", "name")
+	orderDir := c.DefaultQuery("sortDir", "asc")
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "invalid page query",
@@ -45,7 +48,7 @@ func (h *Handler) GetUserFiles(c *gin.Context) {
 		return
 	}
 
-	files, err := h.fileService.GetFiles(c, userID.(string), page, size)
+	files, err := h.fileService.GetFiles(c, userID.(string), orderBy, orderDir, page, size)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

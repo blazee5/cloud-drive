@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	sq "github.com/Masterminds/squirrel"
 	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/files/internal/models"
 	"github.com/jackc/pgx/v5"
@@ -36,9 +37,26 @@ func (s *FileStorage) GetAllByID(ctx context.Context, userID string, input *pb.G
 	if input.GetPage() == 0 {
 		offset = 0
 	}
+
+	if input.GetOrderDir() == "desc" {
+		input.OrderDir = "DESC"
+	} else {
+		input.OrderDir = "ASC"
+	}
+
 	offset = int((input.GetPage() - 1) * input.GetSize())
 
-	rows, err := s.db.Query(ctx, "SELECT id, name, user_id, download_count, created_at FROM files WHERE user_id = $1 ORDER BY id LIMIT $2 OFFSET $3", userID, input.GetSize(), offset)
+	sql, args, err := sq.
+		Select("id", "name", "user_id", "download_count", "created_at").
+		From("files").
+		OrderBy(input.GetOrderBy() + " " + input.GetOrderDir()).
+		Limit(uint64(input.GetSize())).
+		Where(sq.Eq{"user_id": userID}).
+		Offset(uint64(offset)).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	rows, err := s.db.Query(ctx, sql, args...)
 
 	if err != nil {
 		return models.FileList{}, err
