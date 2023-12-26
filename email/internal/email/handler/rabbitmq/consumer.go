@@ -65,6 +65,12 @@ func (c *Consumer) RunConsumer(ctx context.Context, ch <-chan amqp.Delivery) fun
 					c.log.Infof("error while send email: %v", err)
 					continue
 				}
+
+				err := msg.Ack(false)
+
+				if err != nil {
+					c.log.Errorf("failed to acknowledge delivery: %v", err)
+				}
 			}
 		}
 	}

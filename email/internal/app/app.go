@@ -32,41 +32,28 @@ func Run(log *zap.SugaredLogger) {
 	emailService := service.NewService(log)
 	c := consumer.NewConsumer(log, emailService)
 
+	log.Infof("email service starting...")
+
 	err = c.ConsumeQueue(ctx, ch)
 
 	if err != nil {
 		log.Infof("error: %v", err)
 	}
 
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
-	select {
-	case <-quit:
-		err = ch.Close()
+	err = ch.Close()
 
-		if err != nil {
-			log.Infof("error while close channel: %v", err)
-		}
+	if err != nil {
+		log.Infof("error while close channel: %v", err)
+	}
 
-		err = conn.Close()
+	err = conn.Close()
 
-		if err != nil {
-			log.Infof("error while close rabbitmq conn: %v", err)
+	if err != nil {
+		log.Infof("error while close rabbitmq conn: %v", err)
 
-		}
-	case <-ctx.Done():
-		err = ch.Close()
-
-		if err != nil {
-			log.Infof("error while close channel: %v", err)
-		}
-
-		err = conn.Close()
-
-		if err != nil {
-			log.Infof("error while close rabbitmq conn: %v", err)
-
-		}
 	}
 }
