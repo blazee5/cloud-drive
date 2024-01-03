@@ -12,6 +12,7 @@ import (
 	"github.com/blazee5/cloud-drive/auth/lib/auth"
 	"github.com/blazee5/cloud-drive/auth/lib/http_errors"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"time"
 )
@@ -27,13 +28,17 @@ type AuthService struct {
 	storage  storage.Storage
 	producer *rabbitmq.Producer
 	cfg      *config.Config
+	tracer   trace.Tracer
 }
 
-func NewAuthService(log *zap.SugaredLogger, storage storage.Storage, producer *rabbitmq.Producer, cfg *config.Config) *AuthService {
-	return &AuthService{log: log, storage: storage, producer: producer, cfg: cfg}
+func NewAuthService(log *zap.SugaredLogger, storage storage.Storage, producer *rabbitmq.Producer, cfg *config.Config, tracer trace.Tracer) *AuthService {
+	return &AuthService{log: log, storage: storage, producer: producer, cfg: cfg, tracer: tracer}
 }
 
 func (s *AuthService) SignUp(ctx context.Context, input *pb.SignUpRequest) (string, error) {
+	ctx, span := s.tracer.Start(ctx, "authService.SignUp")
+	defer span.End()
+
 	input.Password = auth.GenerateHashPassword(input.Password)
 
 	code, err := uuid.NewUUID()
@@ -70,6 +75,9 @@ func (s *AuthService) SignUp(ctx context.Context, input *pb.SignUpRequest) (stri
 }
 
 func (s *AuthService) GenerateToken(ctx context.Context, input *pb.SignInRequest) (string, error) {
+	ctx, span := s.tracer.Start(ctx, "authService.GenerateToken")
+	defer span.End()
+
 	input.Password = auth.GenerateHashPassword(input.Password)
 	user, err := s.storage.VerifyUser(ctx, input)
 
@@ -87,6 +95,9 @@ func (s *AuthService) GenerateToken(ctx context.Context, input *pb.SignInRequest
 }
 
 func (s *AuthService) ValidateEmail(ctx context.Context, input *pb.ValidateAccountRequest) error {
+	ctx, span := s.tracer.Start(ctx, "authService.ValidateEmail")
+	defer span.End()
+
 	code, err := s.storage.GetActivationCode(ctx, input.GetCode())
 
 	if err != nil {

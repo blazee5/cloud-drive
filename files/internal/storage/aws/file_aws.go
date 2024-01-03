@@ -4,18 +4,23 @@ import (
 	"bytes"
 	"context"
 	"github.com/minio/minio-go/v7"
+	"go.opentelemetry.io/otel/trace"
 	"io"
 )
 
 type Storage struct {
 	client *minio.Client
+	tracer trace.Tracer
 }
 
-func NewStorage(client *minio.Client) *Storage {
-	return &Storage{client: client}
+func NewStorage(client *minio.Client, tracer trace.Tracer) *Storage {
+	return &Storage{client: client, tracer: tracer}
 }
 
 func (s *Storage) SaveFile(ctx context.Context, bucket, fileName, contentType string, chunk []byte) error {
+	ctx, span := s.tracer.Start(ctx, "fileAWSStorage.SaveFile")
+	defer span.End()
+
 	options := minio.PutObjectOptions{
 		ContentType:  contentType,
 		UserMetadata: map[string]string{"x-amz-acl": "public-read"},
@@ -47,6 +52,9 @@ func (s *Storage) SaveFile(ctx context.Context, bucket, fileName, contentType st
 }
 
 func (s *Storage) DownloadFile(ctx context.Context, bucket string, fileName string) ([]byte, error) {
+	ctx, span := s.tracer.Start(ctx, "fileAWSStorage.DownloadFile")
+	defer span.End()
+
 	options := minio.GetObjectOptions{}
 
 	file, err := s.client.GetObject(ctx, bucket, fileName, options)
@@ -65,6 +73,9 @@ func (s *Storage) DownloadFile(ctx context.Context, bucket string, fileName stri
 }
 
 func (s *Storage) UpdateFile(ctx context.Context, bucket, oldName, newName string) error {
+	ctx, span := s.tracer.Start(ctx, "fileAWSStorage.UpdateFile")
+	defer span.End()
+
 	copyDestOpts := minio.CopyDestOptions{
 		Bucket: bucket,
 		Object: newName,
@@ -87,6 +98,9 @@ func (s *Storage) UpdateFile(ctx context.Context, bucket, oldName, newName strin
 }
 
 func (s *Storage) DeleteFile(ctx context.Context, bucket, fileName string) error {
+	ctx, span := s.tracer.Start(ctx, "fileAWSStorage.DeleteFile")
+	defer span.End()
+
 	if err := s.client.RemoveObject(ctx, bucket, fileName, minio.RemoveObjectOptions{}); err != nil {
 		return err
 	}

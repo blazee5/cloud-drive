@@ -100,6 +100,9 @@ func (s *FileStorage) GetAllByID(ctx context.Context, userID string, input *pb.G
 }
 
 func (s *FileStorage) GetByID(ctx context.Context, ID int) (models.File, error) {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.GetByID")
+	defer span.End()
+
 	var file models.File
 
 	err := s.db.QueryRow(ctx, "SELECT id, name, user_id, content_type, download_count, created_at FROM files WHERE id = $1", ID).
@@ -113,6 +116,9 @@ func (s *FileStorage) GetByID(ctx context.Context, ID int) (models.File, error) 
 }
 
 func (s *FileStorage) Create(ctx context.Context, userID string, fileName, contentType string) (int, error) {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.Create")
+	defer span.End()
+
 	var id int
 
 	err := s.db.QueryRow(ctx, `INSERT INTO files (name, user_id, content_type)
@@ -126,6 +132,9 @@ func (s *FileStorage) Create(ctx context.Context, userID string, fileName, conte
 }
 
 func (s *FileStorage) AddCount(ctx context.Context, ID int) error {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.AddCount")
+	defer span.End()
+
 	_, err := s.db.Exec(ctx, "UPDATE files SET download_count = download_count + 1 WHERE id = $1", ID)
 
 	if err != nil {
@@ -136,6 +145,9 @@ func (s *FileStorage) AddCount(ctx context.Context, ID int) error {
 }
 
 func (s *FileStorage) Update(ctx context.Context, ID int, name string) error {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.Update")
+	defer span.End()
+
 	res, err := s.db.Exec(ctx, "UPDATE files SET name = $1 WHERE id = $2 RETURNING id, name, user_id, download_count, created_at", name, ID)
 
 	if err != nil {
@@ -150,6 +162,9 @@ func (s *FileStorage) Update(ctx context.Context, ID int, name string) error {
 }
 
 func (s *FileStorage) Delete(ctx context.Context, ID int) error {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.Delete")
+	defer span.End()
+
 	res, err := s.db.Exec(ctx, "DELETE FROM files WHERE id = $1", ID)
 
 	if err != nil {

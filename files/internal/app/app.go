@@ -36,12 +36,13 @@ func Run(cfg *config.Config) {
 	if err != nil {
 		log.Info("failed to listen: %v", err)
 	}
-	stats := otelgrpc.NewServerHandler(
-		otelgrpc.WithTracerProvider(trace.Provider),
-		otelgrpc.WithPropagators(propagation.TraceContext{}),
-	)
 
-	s := grpc.NewServer(grpc.StatsHandler(stats))
+	s := grpc.NewServer(grpc.StatsHandler(
+		otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(trace.Provider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
+	))
 	pb.RegisterFileServiceServer(s, grpcServer.NewServer(log, services, trace.Tracer))
 
 	log.Info(fmt.Sprintf("server listening at %s", lis.Addr().String()))

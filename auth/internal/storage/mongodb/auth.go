@@ -7,18 +7,23 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.opentelemetry.io/otel/trace"
 	"time"
 )
 
 type AuthStorage struct {
-	db *mongo.Database
+	db     *mongo.Database
+	tracer trace.Tracer
 }
 
-func NewAuthStorage(db *mongo.Database) *AuthStorage {
-	return &AuthStorage{db: db}
+func NewAuthStorage(db *mongo.Database, tracer trace.Tracer) *AuthStorage {
+	return &AuthStorage{db: db, tracer: tracer}
 }
 
 func (s *AuthStorage) SignUp(ctx context.Context, input *pb.SignUpRequest, code string) (string, error) {
+	ctx, span := s.tracer.Start(ctx, "authStorage.SignUp")
+	defer span.End()
+
 	res, err := s.db.Collection("users").InsertOne(ctx, models.User{
 		Username:    input.Username,
 		Email:       input.Email,
@@ -50,6 +55,9 @@ func (s *AuthStorage) SignUp(ctx context.Context, input *pb.SignUpRequest, code 
 }
 
 func (s *AuthStorage) VerifyUser(ctx context.Context, input *pb.SignInRequest) (models.User, error) {
+	ctx, span := s.tracer.Start(ctx, "authStorage.VerifyUser")
+	defer span.End()
+
 	var user models.User
 
 	filter := bson.D{
@@ -67,6 +75,9 @@ func (s *AuthStorage) VerifyUser(ctx context.Context, input *pb.SignInRequest) (
 }
 
 func (s *AuthStorage) GetActivationCode(ctx context.Context, code string) (models.ActivationCode, error) {
+	ctx, span := s.tracer.Start(ctx, "authStorage.GetActivationCode")
+	defer span.End()
+
 	var activationCode models.ActivationCode
 
 	err := s.db.Collection("activation_codes").FindOne(ctx, bson.D{
@@ -81,6 +92,9 @@ func (s *AuthStorage) GetActivationCode(ctx context.Context, code string) (model
 }
 
 func (s *AuthStorage) ActivateUser(ctx context.Context, userID string) error {
+	ctx, span := s.tracer.Start(ctx, "authStorage.ActivateUser")
+	defer span.End()
+
 	objectID, err := primitive.ObjectIDFromHex(userID)
 
 	if err != nil {
@@ -101,6 +115,9 @@ func (s *AuthStorage) ActivateUser(ctx context.Context, userID string) error {
 }
 
 func (s *AuthStorage) DeleteActivationCode(ctx context.Context, ID string) error {
+	ctx, span := s.tracer.Start(ctx, "authStorage.DeleteActivationCode")
+	defer span.End()
+
 	objectID, err := primitive.ObjectIDFromHex(ID)
 
 	if err != nil {

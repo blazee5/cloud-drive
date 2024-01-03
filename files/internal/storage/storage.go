@@ -35,6 +35,6 @@ type AwsStorage interface {
 func NewStorage(db *pgxpool.Pool, awsClient *minio.Client, tracer trace.Tracer) *Storage {
 	return &Storage{
 		PostgresStorage: postgres.NewFileStorage(db, tracer),
-		AwsStorage:      aws.NewStorage(awsClient),
+		AwsStorage:      aws.NewStorage(awsClient, tracer),
 	}
 }

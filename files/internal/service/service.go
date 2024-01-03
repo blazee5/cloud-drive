@@ -38,6 +38,9 @@ func (s *FileService) GetFilesByID(ctx context.Context, userID string, input *pb
 }
 
 func (s *FileService) Upload(ctx context.Context, fileName, userID, contentType string, chunk []byte) (int, error) {
+	ctx, span := s.tracer.Start(ctx, "fileService.Upload")
+	defer span.End()
+
 	err := s.repo.AwsStorage.SaveFile(ctx, userID, fileName, contentType, chunk)
 
 	if err != nil {
@@ -48,6 +51,9 @@ func (s *FileService) Upload(ctx context.Context, fileName, userID, contentType 
 }
 
 func (s *FileService) Download(ctx context.Context, userID string, ID int) (*domain.File, error) {
+	ctx, span := s.tracer.Start(ctx, "fileService.Download")
+	defer span.End()
+
 	file, err := s.repo.GetByID(ctx, ID)
 
 	if err != nil {
@@ -76,6 +82,9 @@ func (s *FileService) Download(ctx context.Context, userID string, ID int) (*dom
 }
 
 func (s *FileService) Update(ctx context.Context, userID string, ID int, input *pb.UpdateFileRequest) error {
+	ctx, span := s.tracer.Start(ctx, "fileService.Update")
+	defer span.End()
+
 	file, err := s.repo.GetByID(ctx, ID)
 
 	if err != nil {
@@ -104,6 +113,9 @@ func (s *FileService) Update(ctx context.Context, userID string, ID int, input *
 }
 
 func (s *FileService) Delete(ctx context.Context, userID string, ID int) error {
+	ctx, span := s.tracer.Start(ctx, "fileService.Delete")
+	defer span.End()
+
 	file, err := s.repo.GetByID(ctx, ID)
 
 	if err != nil {

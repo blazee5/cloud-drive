@@ -11,6 +11,9 @@ import (
 	"github.com/blazee5/cloud-drive/auth/internal/storage/mongodb"
 	"github.com/blazee5/cloud-drive/auth/lib/logger"
 	"github.com/blazee5/cloud-drive/auth/lib/rabbitmq"
+	"github.com/blazee5/cloud-drive/auth/lib/tracer"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -25,10 +28,11 @@ func Run(cfg *config.Config) {
 
 	client := mongodb.NewMongoDB(ctx, cfg)
 	db := client.Database(cfg.DBName)
-	storages := mongodb.NewAuthStorage(db)
+	trace := tracer.InitTracer("auth microservice")
+	storages := mongodb.NewAuthStorage(db, trace.Tracer)
 	rabbitConn := rabbitmq.NewRabbitMQConn(cfg)
 	msgProducer := producer.NewProducer(log, rabbitConn)
-	services := service.NewAuthService(log, storages, msgProducer, cfg)
+	services := service.NewAuthService(log, storages, msgProducer, cfg, trace.Tracer)
 
 	err := msgProducer.InitProducer(cfg)
 
@@ -43,9 +47,14 @@ func Run(cfg *config.Config) {
 	}
 
 	log.Info(fmt.Sprintf("server listening at %s", lis.Addr().String()))
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.StatsHandler(
+		otelgrpc.NewServerHandler(
+			otelgrpc.WithTracerProvider(trace.Provider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
+	))
 
-	pb.RegisterAuthServiceServer(s, handler.NewServer(log, services))
+	pb.RegisterAuthServiceServer(s, handler.NewServer(log, services, trace.Tracer))
 
 	go func() {
 		if err := s.Serve(lis); err != nil {

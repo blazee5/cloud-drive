@@ -6,6 +6,7 @@ import (
 	"github.com/blazee5/cloud-drive-protos/auth"
 	"github.com/blazee5/cloud-drive/auth/internal/service"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,14 +15,18 @@ import (
 type Server struct {
 	log     *zap.SugaredLogger
 	service service.Service
+	tracer  trace.Tracer
 	auth.UnimplementedAuthServiceServer
 }
 
-func NewServer(log *zap.SugaredLogger, service service.Service) *Server {
-	return &Server{log: log, service: service}
+func NewServer(log *zap.SugaredLogger, service service.Service, tracer trace.Tracer) *Server {
+	return &Server{log: log, service: service, tracer: tracer}
 }
 
 func (s *Server) SignUp(ctx context.Context, in *auth.SignUpRequest) (*auth.UserResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "auth.SignUp")
+	defer span.End()
+
 	id, err := s.service.SignUp(ctx, in)
 
 	if err != nil {
@@ -33,6 +38,9 @@ func (s *Server) SignUp(ctx context.Context, in *auth.SignUpRequest) (*auth.User
 }
 
 func (s *Server) SignIn(ctx context.Context, in *auth.SignInRequest) (*auth.Token, error) {
+	ctx, span := s.tracer.Start(ctx, "auth.SignIn")
+	defer span.End()
+
 	token, err := s.service.GenerateToken(ctx, in)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
@@ -48,6 +56,9 @@ func (s *Server) SignIn(ctx context.Context, in *auth.SignInRequest) (*auth.Toke
 }
 
 func (s *Server) ValidateAccount(ctx context.Context, in *auth.ValidateAccountRequest) (*auth.ValidateAccountResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "auth.ValidateAccount")
+	defer span.End()
+
 	err := s.service.ValidateEmail(ctx, in)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {

@@ -66,6 +66,9 @@ func (s *Server) GetFiles(ctx context.Context, input *pb.GetFilesRequest) (*pb.G
 }
 
 func (s *Server) UploadFile(ctx context.Context, input *pb.UploadRequest) (*pb.UploadResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "file.UploadFile")
+	defer span.End()
+
 	if input.GetFileName() == "" {
 		return &pb.UploadResponse{}, status.Errorf(codes.InvalidArgument, "filename is required field")
 	}
@@ -89,6 +92,9 @@ func (s *Server) UploadFile(ctx context.Context, input *pb.UploadRequest) (*pb.U
 }
 
 func (s *Server) DownloadFile(ctx context.Context, input *pb.FileRequest) (*pb.File, error) {
+	ctx, span := s.tracer.Start(ctx, "file.DownloadFile")
+	defer span.End()
+
 	file, err := s.service.Download(ctx, input.GetUserId(), int(input.GetId()))
 
 	if errors.Is(err, sql.ErrNoRows) {
@@ -110,6 +116,9 @@ func (s *Server) DownloadFile(ctx context.Context, input *pb.FileRequest) (*pb.F
 }
 
 func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*pb.SuccessResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "file.UpdateFile")
+	defer span.End()
+
 	err := s.service.Update(ctx, input.GetUserId(), int(input.GetId()), input)
 
 	if errors.Is(err, http_errors.PermissionDenied) {
@@ -131,6 +140,9 @@ func (s *Server) UpdateFile(ctx context.Context, input *pb.UpdateFileRequest) (*
 }
 
 func (s *Server) DeleteFile(ctx context.Context, input *pb.FileRequest) (*pb.SuccessResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "file.DeleteFile")
+	defer span.End()
+
 	err := s.service.Delete(ctx, input.GetUserId(), int(input.GetId()))
 
 	if errors.Is(err, http_errors.PermissionDenied) {
