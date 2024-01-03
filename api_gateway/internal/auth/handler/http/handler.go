@@ -36,6 +36,17 @@ func (h *Handler) SignUp(c *gin.Context) {
 
 	id, err := h.authService.SignUp(ctx, input)
 
+	st, ok := status.FromError(err)
+
+	if ok {
+		if st.Code() == codes.AlreadyExists {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "email already used",
+			})
+			return
+		}
+	}
+
 	if err != nil {
 		h.log.Infof("error while sign up: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -30,6 +30,10 @@ func (s *Server) SignUp(ctx context.Context, in *auth.SignUpRequest) (*auth.User
 	id, err := s.service.SignUp(ctx, in)
 
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return &auth.UserResponse{}, status.Errorf(codes.AlreadyExists, "email already used")
+		}
+
 		s.log.Infof("error while signup: %v", err)
 		return &auth.UserResponse{}, status.Errorf(codes.Internal, "server error")
 	}
