@@ -7,19 +7,24 @@ import (
 	"github.com/blazee5/cloud-drive/files/internal/models"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"math"
 )
 
 type FileStorage struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	tracer trace.Tracer
 }
 
-func NewFileStorage(db *pgxpool.Pool) *FileStorage {
-	return &FileStorage{db: db}
+func NewFileStorage(db *pgxpool.Pool, tracer trace.Tracer) *FileStorage {
+	return &FileStorage{db: db, tracer: tracer}
 }
 
 func (s *FileStorage) GetAllByID(ctx context.Context, userID string, input *pb.GetFilesRequest) (models.FileList, error) {
+	ctx, span := s.tracer.Start(ctx, "fileStorage.GetAllByID")
+	defer span.End()
+
 	var total int
 
 	if err := s.db.QueryRow(ctx, "SELECT COUNT(*) FROM files WHERE user_id = $1", userID).Scan(&total); err != nil {

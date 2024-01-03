@@ -4,6 +4,7 @@ import (
 	"github.com/blazee5/cloud-drive/api_gateway/internal/auth"
 	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,13 +14,17 @@ import (
 type Handler struct {
 	log         *zap.SugaredLogger
 	authService auth.Service
+	tracer      trace.Tracer
 }
 
-func NewHandler(log *zap.SugaredLogger, authService auth.Service) *Handler {
-	return &Handler{log: log, authService: authService}
+func NewHandler(log *zap.SugaredLogger, authService auth.Service, tracer trace.Tracer) *Handler {
+	return &Handler{log: log, authService: authService, tracer: tracer}
 }
 
 func (h *Handler) SignUp(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "authHandler.SignUp")
+	defer span.End()
+
 	var input domain.SignUpRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -29,7 +34,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	id, err := h.authService.SignUp(c, input)
+	id, err := h.authService.SignUp(ctx, input)
 
 	if err != nil {
 		h.log.Infof("error while sign up: %v", err)
@@ -45,6 +50,9 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "authHandler.SignIn")
+	defer span.End()
+
 	var input domain.SignInRequest
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -54,7 +62,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authService.SignIn(c, input)
+	token, err := h.authService.SignIn(ctx, input)
 
 	st, ok := status.FromError(err)
 
@@ -81,9 +89,12 @@ func (h *Handler) SignIn(c *gin.Context) {
 }
 
 func (h *Handler) ActivateAccount(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "authHandler.ActivateAccount")
+	defer span.End()
+
 	code := c.Query("code")
 
-	res, err := h.authService.ActivateAccount(c, code)
+	res, err := h.authService.ActivateAccount(ctx, code)
 
 	st, ok := status.FromError(err)
 

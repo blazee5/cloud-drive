@@ -9,7 +9,7 @@ db:
   port: "5432"
   user: "postgres"
   db_name: "cloud-drive"
-  ssl_mode: "false"
+  ssl_mode: "disable"
 
 aws:
   endpoint: "127.0.0.1:9000"

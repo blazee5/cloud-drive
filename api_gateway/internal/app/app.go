@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"github.com/blazee5/cloud-drive/api_gateway/internal/server"
+	"github.com/blazee5/cloud-drive/api_gateway/lib/tracer"
 	"go.uber.org/zap"
 	"os"
 	"os/signal"
@@ -10,7 +11,8 @@ import (
 )
 
 func Run(log *zap.SugaredLogger) {
-	srv := server.NewServer(log)
+	trace := tracer.InitTracer("api gateway")
+	srv := server.NewServer(log, trace)
 	go func() {
 		if err := srv.Run(srv.InitRoutes()); err != nil {
 			log.Fatalf("Error while start server: %v", err)

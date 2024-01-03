@@ -9,15 +9,15 @@ import (
 )
 
 func NewPgxConn(ctx context.Context, cfg *config.Config) *pgxpool.Pool {
-	db, err := pgxpool.New(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%t",
+	db, err := pgxpool.New(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port, cfg.DB.DBName, cfg.DB.SSLMode))
 
 	if err != nil {
-		log.Fatalf("error while connect to postgres: %v", err)
+		log.Fatal("Error connecting to database: ", err)
 	}
 
-	if err = db.Ping(ctx); err != nil {
-		log.Fatalf("error while connect to postgres: %v", err)
+	if err := db.Ping(ctx); err != nil {
+		log.Fatal("Error connecting to database: ", err)
 	}
 
 	return db

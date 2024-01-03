@@ -8,6 +8,7 @@ import (
 	"github.com/blazee5/cloud-drive/files/internal/service"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
 	"github.com/jackc/pgx/v5"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,14 +17,18 @@ import (
 type Server struct {
 	log     *zap.SugaredLogger
 	service service.Service
+	tracer  trace.Tracer
 	pb.UnimplementedFileServiceServer
 }
 
-func NewServer(log *zap.SugaredLogger, service service.Service) *Server {
-	return &Server{log: log, service: service}
+func NewServer(log *zap.SugaredLogger, service service.Service, tracer trace.Tracer) *Server {
+	return &Server{log: log, service: service, tracer: tracer}
 }
 
 func (s *Server) GetFiles(ctx context.Context, input *pb.GetFilesRequest) (*pb.GetFileResponse, error) {
+	ctx, span := s.tracer.Start(ctx, "file.GetFiles")
+	defer span.End()
+
 	if input.GetUserId() == "" {
 		return &pb.GetFileResponse{}, status.Errorf(codes.InvalidArgument, "user_id is required field")
 	}

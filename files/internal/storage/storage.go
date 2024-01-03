@@ -8,6 +8,7 @@ import (
 	"github.com/blazee5/cloud-drive/files/internal/storage/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/minio/minio-go/v7"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Storage struct {
@@ -31,9 +32,9 @@ type AwsStorage interface {
 	DeleteFile(ctx context.Context, bucket, fileName string) error
 }
 
-func NewStorage(db *pgxpool.Pool, awsClient *minio.Client) *Storage {
+func NewStorage(db *pgxpool.Pool, awsClient *minio.Client, tracer trace.Tracer) *Storage {
 	return &Storage{
-		PostgresStorage: postgres.NewFileStorage(db),
+		PostgresStorage: postgres.NewFileStorage(db, tracer),
 		AwsStorage:      aws.NewStorage(awsClient),
 	}
 }

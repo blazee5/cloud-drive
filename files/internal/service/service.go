@@ -7,6 +7,7 @@ import (
 	"github.com/blazee5/cloud-drive/files/internal/models"
 	"github.com/blazee5/cloud-drive/files/internal/storage"
 	"github.com/blazee5/cloud-drive/files/lib/http_errors"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"path/filepath"
 )
@@ -20,15 +21,19 @@ type Service interface {
 }
 
 type FileService struct {
-	log  *zap.SugaredLogger
-	repo *storage.Storage
+	log    *zap.SugaredLogger
+	repo   *storage.Storage
+	tracer trace.Tracer
 }
 
-func NewFileService(log *zap.SugaredLogger, repo *storage.Storage) *FileService {
-	return &FileService{log: log, repo: repo}
+func NewFileService(log *zap.SugaredLogger, repo *storage.Storage, tracer trace.Tracer) *FileService {
+	return &FileService{log: log, repo: repo, tracer: tracer}
 }
 
 func (s *FileService) GetFilesByID(ctx context.Context, userID string, input *pb.GetFilesRequest) (models.FileList, error) {
+	ctx, span := s.tracer.Start(ctx, "fileService.GetFilesByID")
+	defer span.End()
+
 	return s.repo.PostgresStorage.GetAllByID(ctx, userID, input)
 }
 

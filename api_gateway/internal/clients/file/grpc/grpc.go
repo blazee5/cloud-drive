@@ -3,8 +3,11 @@ package grpc
 import (
 	"context"
 	pb "github.com/blazee5/cloud-drive-protos/files"
+	"github.com/blazee5/cloud-drive/api_gateway/lib/tracer"
 	grpclog "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpcretry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -15,7 +18,7 @@ import (
 	"time"
 )
 
-func NewFileServiceClient(log *zap.SugaredLogger) pb.FileServiceClient {
+func NewFileServiceClient(log *zap.SugaredLogger, tracer *tracer.JaegerTracing) pb.FileServiceClient {
 	timeout, err := time.ParseDuration(os.Getenv("CLIENT_TIMEOUT"))
 
 	if err != nil {
@@ -44,7 +47,10 @@ func NewFileServiceClient(log *zap.SugaredLogger) pb.FileServiceClient {
 			grpclog.UnaryClientInterceptor(InterceptorLogger(), logOpts...),
 			grpcretry.UnaryClientInterceptor(retryOpts...),
 		),
-	)
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
+			otelgrpc.WithTracerProvider(tracer.Provider),
+			otelgrpc.WithPropagators(propagation.TraceContext{})),
+		))
 
 	if err != nil {
 		log.Fatalf("error while connect to files client: %s", err)

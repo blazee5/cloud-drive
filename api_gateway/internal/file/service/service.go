@@ -5,6 +5,8 @@ import (
 	pb "github.com/blazee5/cloud-drive-protos/files"
 	"github.com/blazee5/cloud-drive/api_gateway/internal/clients/file/grpc"
 	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
+	"github.com/blazee5/cloud-drive/api_gateway/lib/tracer"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"io"
 	"mime/multipart"
@@ -12,18 +14,23 @@ import (
 )
 
 type Service struct {
-	log *zap.SugaredLogger
-	api pb.FileServiceClient
+	log    *zap.SugaredLogger
+	api    pb.FileServiceClient
+	tracer trace.Tracer
 }
 
-func NewService(log *zap.SugaredLogger) *Service {
+func NewService(log *zap.SugaredLogger, tracer *tracer.JaegerTracing) *Service {
 	return &Service{
-		log: log,
-		api: grpc.NewFileServiceClient(log),
+		log:    log,
+		api:    grpc.NewFileServiceClient(log, tracer),
+		tracer: tracer.Tracer,
 	}
 }
 
 func (s *Service) GetFiles(ctx context.Context, userID, orderBy, orderDir string, page, size int) (domain.FileList, error) {
+	ctx, span := s.tracer.Start(ctx, "filesService.GetFiles")
+	defer span.End()
+
 	filesProto, err := s.api.GetFiles(ctx, &pb.GetFilesRequest{
 		UserId:   userID,
 		Page:     int64(page),
@@ -58,6 +65,9 @@ func (s *Service) GetFiles(ctx context.Context, userID, orderBy, orderDir string
 }
 
 func (s *Service) UploadFile(ctx context.Context, userID string, fileHeader *multipart.FileHeader) (int, error) {
+	ctx, span := s.tracer.Start(ctx, "filesService.UploadFile")
+	defer span.End()
+
 	file, err := fileHeader.Open()
 	defer file.Close()
 
@@ -86,6 +96,9 @@ func (s *Service) UploadFile(ctx context.Context, userID string, fileHeader *mul
 }
 
 func (s *Service) DownloadFile(ctx context.Context, ID int, userID string) (*pb.File, error) {
+	ctx, span := s.tracer.Start(ctx, "filesService.DownloadFile")
+	defer span.End()
+
 	file, err := s.api.DownloadFile(ctx, &pb.FileRequest{
 		Id:     int64(ID),
 		UserId: userID,
@@ -99,6 +112,9 @@ func (s *Service) DownloadFile(ctx context.Context, ID int, userID string) (*pb.
 }
 
 func (s *Service) UpdateFile(ctx context.Context, ID int, userID string, input domain.UpdateFileInput) error {
+	ctx, span := s.tracer.Start(ctx, "filesService.UpdateFile")
+	defer span.End()
+
 	_, err := s.api.UpdateFile(ctx, &pb.UpdateFileRequest{
 		Id:     int64(ID),
 		UserId: userID,
@@ -113,6 +129,9 @@ func (s *Service) UpdateFile(ctx context.Context, ID int, userID string, input d
 }
 
 func (s *Service) DeleteFile(ctx context.Context, ID int, userID string) error {
+	ctx, span := s.tracer.Start(ctx, "filesService.DeleteFile")
+	defer span.End()
+
 	_, err := s.api.DeleteFile(ctx, &pb.FileRequest{
 		Id:     int64(ID),
 		UserId: userID,

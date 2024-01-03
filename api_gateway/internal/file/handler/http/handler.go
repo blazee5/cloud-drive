@@ -4,6 +4,7 @@ import (
 	"github.com/blazee5/cloud-drive/api_gateway/internal/domain"
 	"github.com/blazee5/cloud-drive/api_gateway/internal/file"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,13 +15,17 @@ import (
 type Handler struct {
 	log         *zap.SugaredLogger
 	fileService file.Service
+	tracer      trace.Tracer
 }
 
-func NewHandler(log *zap.SugaredLogger, fileService file.Service) *Handler {
-	return &Handler{log: log, fileService: fileService}
+func NewHandler(log *zap.SugaredLogger, fileService file.Service, trace trace.Tracer) *Handler {
+	return &Handler{log: log, fileService: fileService, tracer: trace}
 }
 
 func (h *Handler) GetUserFiles(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "filesHandler.GetUserFiles")
+	defer span.End()
+
 	userID, ok := c.Get("userID")
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -48,7 +53,7 @@ func (h *Handler) GetUserFiles(c *gin.Context) {
 		return
 	}
 
-	files, err := h.fileService.GetFiles(c, userID.(string), orderBy, orderDir, page, size)
+	files, err := h.fileService.GetFiles(ctx, userID.(string), orderBy, orderDir, page, size)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -61,6 +66,9 @@ func (h *Handler) GetUserFiles(c *gin.Context) {
 }
 
 func (h *Handler) UploadFile(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "filesHandler.UploadFile")
+	defer span.End()
+
 	userID, ok := c.Get("userID")
 
 	if ok != true {
@@ -77,7 +85,7 @@ func (h *Handler) UploadFile(c *gin.Context) {
 		return
 	}
 
-	id, err := h.fileService.UploadFile(c, userID.(string), file)
+	id, err := h.fileService.UploadFile(ctx, userID.(string), file)
 
 	if err != nil {
 		h.log.Infof("error while upload file: %v", err)
@@ -93,6 +101,9 @@ func (h *Handler) UploadFile(c *gin.Context) {
 }
 
 func (h *Handler) DownloadFile(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "filesHandler.DownloadFile")
+	defer span.End()
+
 	userID, ok := c.Get("userID")
 
 	if ok != true {
@@ -107,7 +118,7 @@ func (h *Handler) DownloadFile(c *gin.Context) {
 		})
 	}
 
-	file, err := h.fileService.DownloadFile(c, ID, userID.(string))
+	file, err := h.fileService.DownloadFile(ctx, ID, userID.(string))
 
 	st, _ := status.FromError(err)
 
@@ -130,6 +141,9 @@ func (h *Handler) DownloadFile(c *gin.Context) {
 }
 
 func (h *Handler) UpdateFile(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "filesHandler.UpdateFile")
+	defer span.End()
+
 	var input domain.UpdateFileInput
 
 	userID, ok := c.Get("userID")
@@ -153,7 +167,7 @@ func (h *Handler) UpdateFile(c *gin.Context) {
 		return
 	}
 
-	err = h.fileService.UpdateFile(c, ID, userID.(string), input)
+	err = h.fileService.UpdateFile(ctx, ID, userID.(string), input)
 
 	st, ok := status.FromError(err)
 
@@ -178,6 +192,9 @@ func (h *Handler) UpdateFile(c *gin.Context) {
 }
 
 func (h *Handler) DeleteFile(c *gin.Context) {
+	ctx, span := h.tracer.Start(c.Request.Context(), "filesHandler.DeleteFile")
+	defer span.End()
+
 	userID, ok := c.Get("userID")
 
 	if ok != true {
@@ -192,7 +209,7 @@ func (h *Handler) DeleteFile(c *gin.Context) {
 		})
 	}
 
-	err = h.fileService.DeleteFile(c, ID, userID.(string))
+	err = h.fileService.DeleteFile(ctx, ID, userID.(string))
 
 	st, _ := status.FromError(err)
 

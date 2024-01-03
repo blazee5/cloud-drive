@@ -20,7 +20,7 @@ type DB struct {
 	User     string `yaml:"user" env-default:"postgres"`
 	DBName   string `yaml:"db_name" env-default:"files"`
 	Password string `yaml:"password"`
-	SSLMode  bool   `yaml:"ssl_mode" env-default:"false"`
+	SSLMode  string `yaml:"ssl_mode" env-default:"disabled"`
 }
 
 type AWS struct {
